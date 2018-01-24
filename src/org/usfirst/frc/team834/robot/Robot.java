@@ -40,7 +40,7 @@ public class Robot extends VisualRobot {
 		driveTrain = new DifferentialDrive(left, right);
 		
 		//Gets randomized colors ("LLL", "LRL")
-		gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(),3);
+		gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 2);
 		
 		super.sensors.put("rightEncoder", rightEncoder);
 		super.sensors.put("leftEncoder", leftEncoder);
@@ -55,9 +55,9 @@ public class Robot extends VisualRobot {
 	@Override
 	public void autonomous() {
 		
-		//Gets string from Smart Dashboard
+		//Gets string from SmartDashboard
 		String robotLocation = SmartDashboard.getString("DB/String 0", "default"); //Input is "Center", "Right", or "Left"
-		String priority = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch" or "Scale"
+		String priority = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch", "Scale"
 		
 		ChooseAuton c = new ChooseAuton(this);
 		c.chooseAuton(robotLocation + priority + gameData); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
