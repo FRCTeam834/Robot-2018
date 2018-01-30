@@ -3,11 +3,7 @@ package org.usfirst.frc.team834.robot;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import visualrobot.*;
@@ -39,7 +35,10 @@ public class Robot extends VisualRobot {
 		
 		driveTrain = new DifferentialDrive(left, right);
 		
-		//Gets randomized colors ("LLL", "LRL")
+		//Distance per revolution/256 pulse per revolution
+		rightEncoder.setDistancePerPulse(256);
+		
+		//Gets randomized colors and removes last letter because not needed for auton ("LL", "LR")
 		gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 2);
 		
 		super.sensors.put("rightEncoder", rightEncoder);
@@ -57,7 +56,7 @@ public class Robot extends VisualRobot {
 		
 		//Gets string from SmartDashboard
 		String robotLocation = SmartDashboard.getString("DB/String 0", "default"); //Input is "Center", "Right", or "Left"
-		String priority = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch", "Scale"
+		String priority = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch" or "Scale"
 		
 		ChooseAuton c = new ChooseAuton(this);
 		c.chooseAuton(robotLocation + priority + gameData); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
