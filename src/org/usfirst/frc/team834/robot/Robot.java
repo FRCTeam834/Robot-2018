@@ -24,8 +24,7 @@ public class Robot extends VisualRobot {
 	private Encoder leftEncoder = new Encoder(2, 3);
 	private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 	
-	//Climber
-	//Intake (2) (L Bumper Intake, R Bumper Outtake)
+	//Intake 2 motors opposite and one to close
 	
 	String gameData;
 	
