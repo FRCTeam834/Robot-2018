@@ -1,6 +1,5 @@
 package org.usfirst.frc.team834.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.*;
@@ -14,12 +13,9 @@ public class Robot extends VisualRobot {
 	private DifferentialDrive driveTrain;
 	private Joystick leftStick;
 	private Joystick rightStick;
+	private Joystick xbox;
 	
-	/*
-	 * 0-2 Right Drive
-	 * 3-5 Left Drive
-	 */
-	TalonSRX[] motors = new TalonSRX[5];
+	private SpeedController elevator = new WPI_TalonSRX(7);
 	
 	SpeedController left = new MultiSpeedController(new WPI_TalonSRX(0), new WPI_TalonSRX(1), new WPI_TalonSRX(2));
 	SpeedController right = new MultiSpeedController(new WPI_TalonSRX(3),new WPI_TalonSRX(4), new WPI_TalonSRX(5));
@@ -27,6 +23,9 @@ public class Robot extends VisualRobot {
 	private Encoder rightEncoder = new Encoder(0, 1);
 	private Encoder leftEncoder = new Encoder(2, 3);
 	private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+	
+	//Climber
+	//Intake (2) (L Bumper Intake, R Bumper Outtake)
 	
 	String gameData;
 	
@@ -39,7 +38,7 @@ public class Robot extends VisualRobot {
 		rightEncoder.setDistancePerPulse(256);
 		
 		//Gets randomized colors and removes last letter because not needed for auton ("LL", "LR")
-		gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 2);
+		//gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 2);
 		
 		super.sensors.put("rightEncoder", rightEncoder);
 		super.sensors.put("leftEncoder", leftEncoder);
@@ -65,14 +64,22 @@ public class Robot extends VisualRobot {
 	@Override
 	public void teleOpInit() {
 		
-		leftStick = new Joystick(0);
-		rightStick = new Joystick(1);
+		leftStick = new Joystick(1);
+		rightStick = new Joystick(0);
+		xbox = new Joystick(2);
 	}
 	
 	@Override
 	public void teleOpPeriodic() {
 		
 		driveTrain.tankDrive(leftStick.getY(), rightStick.getY());
+		if (xbox.getRawButton(4)) {
+			elevator.set(1.0);
+		} else if (xbox.getRawButton(1)) {
+			elevator.set(-1.0);
+		} else {
+			elevator.set(0);
+		}
 	}
 	
 	@Override
