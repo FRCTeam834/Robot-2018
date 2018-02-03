@@ -24,6 +24,9 @@ public class Robot extends VisualRobot {
 	private Encoder leftEncoder = new Encoder(2, 3);
 	private ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 	
+	//Climber
+	//Intake (2) (L Bumper Intake, R Bumper Outtake)
+	
 	String gameData;
 	
 	@Override
@@ -35,7 +38,7 @@ public class Robot extends VisualRobot {
 		rightEncoder.setDistancePerPulse(256);
 		
 		//Gets randomized colors and removes last letter because not needed for auton ("LL", "LR")
-		//gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 2);
+		gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 3);
 		
 		super.sensors.put("rightEncoder", rightEncoder);
 		super.sensors.put("leftEncoder", leftEncoder);
@@ -82,6 +85,7 @@ public class Robot extends VisualRobot {
 	@Override
 	public void setLeftSide(double speed) {
 		
+		//Prevents speed from being set over max of 1
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
 		
@@ -91,6 +95,7 @@ public class Robot extends VisualRobot {
 	@Override
 	public void setRightSide(double speed) {
 		
+		//Prevents speed from being set over max of 1
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
 		
@@ -99,6 +104,6 @@ public class Robot extends VisualRobot {
 	
 	public static String removeCharAt(String s, int pos) {
 		
-		return s.substring(0, pos) + s.substring(pos + 1);
+		return s.substring(0, pos - 1) + s.substring(pos);
 	}
 }
