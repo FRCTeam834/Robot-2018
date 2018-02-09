@@ -10,5 +10,6 @@
 	<classpathentry kind="var" path="USERLIBS_DIR/BuildAnAuton.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar" sourcepath="/CTRE_Phoenix.sources"/>
+	<classpathentry kind="lib" path="C:/Users/24kjd/Desktop/Eclipse/BuildAnAuton2.0/Downloads/BuildAnAuton.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
