@@ -2,6 +2,8 @@ package org.usfirst.frc.team834.robot;
 
 
 
+import java.util.ArrayList;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -9,11 +11,15 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import visualrobot.ChooseAuton;
+import visualrobot.Command;
+import visualrobot.MoveStraightCommand;
 import visualrobot.VisualRobot;
 
 
@@ -31,8 +37,8 @@ public class Robot extends VisualRobot {
 	
 	
 	//Speed Controllers
-	SpeedController leftDrive = new MultiSpeedController(new WPI_TalonSRX(1), new WPI_TalonSRX(2), new WPI_TalonSRX(3));
-	SpeedController rightDrive = new MultiSpeedController(new WPI_TalonSRX(4),new WPI_TalonSRX(5), new WPI_TalonSRX(6));
+	SpeedControllerGroup leftDrive = new SpeedControllerGroup(new WPI_TalonSRX(1), new WPI_TalonSRX(2), new WPI_TalonSRX(3));
+	SpeedControllerGroup rightDrive = new SpeedControllerGroup(new WPI_TalonSRX(4),new WPI_TalonSRX(5), new WPI_TalonSRX(6));
 	SpeedController elevator = new WPI_TalonSRX(7);
 	SpeedController climber = new WPI_TalonSRX(8);
 	Talon intakeLeft = new Talon(0);//TalonSR PWM0
@@ -52,12 +58,11 @@ public class Robot extends VisualRobot {
 	
 	@Override
 	public void robotInit() {
-		
 		driveTrain = new DifferentialDrive(leftDrive, rightDrive);
 
 		//Distance per revolution/256 pulse per revolution
-		leftEncoder.setDistancePerPulse(256);
-		rightEncoder.setDistancePerPulse(256);
+		leftEncoder.setDistancePerPulse(-6.0*Math.PI/256.0);
+		rightEncoder.setDistancePerPulse(6.0*Math.PI/256.0);
 
 		//gameData = removeCharAt(DriverStation.getInstance().getGameSpecificMessage(), 3); //Gets the game data and removes the third character
 		
@@ -79,15 +84,16 @@ public class Robot extends VisualRobot {
 		gyro.reset();
 		
 		gyro.calibrate();
+		
+		driveTrain.setSafetyEnabled(false);
 
 	}
-
-
 
 	@Override
 	public void autonomous() {
 
-		
+		rightEncoder.reset();
+		leftEncoder.reset();
 
 		//Gets strings from SmartDashboard
 
@@ -95,14 +101,39 @@ public class Robot extends VisualRobot {
 		String priority = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch" or "Scale"
 
 		//Gets plate location from DS
-		String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
+		//String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 
 		
 		
 		//Tells BuildAnAuton to use the correct auton	
-		ChooseAuton chooseAnAuton = new ChooseAuton(this);
-		chooseAnAuton.chooseAuton(robotLocation + priority + gameData); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+		//ChooseAuton chooseAnAuton = new ChooseAuton(this);
+		//chooseAnAuton.chooseAuton(robotLocation + priority + gameData); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 
+		
+		
+		System.out.println("Auton Started");
+			ChooseAuton c = new ChooseAuton(this);
+
+			c.chooseAuton(robotLocation);
+			
+			ArrayList<Command> t = c.cmdSet.getMain();
+
+			
+			System.out.println("Before Loop");
+			for(Command com : t) {
+System.out.println("In Loop");
+				if(com.getClass().equals(visualrobot.MoveStraightCommand.class)) {
+System.out.println("In MoveStraight");
+					((MoveStraightCommand) com).distance -=  6;
+System.out.println("Running MoveStraight");
+				}
+
+			}
+
+			
+			
+			
+			System.out.println("Done with Auton!");
 	}
 
 
@@ -140,7 +171,7 @@ public class Robot extends VisualRobot {
 
 		// Makes xbox control elevator
 
-		if (xbox.getRawButton(1)) {
+		if (xbox.getRawButton(3)) {
 
 			elevator.set(1.0);
 
@@ -301,7 +332,7 @@ public class Robot extends VisualRobot {
 	@Override
 	public void setLeftSide(double speed) {
 
-		
+		System.out.println("Accessing setLeftSide");
 
 		//Prevents speed from being set over max of 1
 
@@ -312,6 +343,7 @@ public class Robot extends VisualRobot {
 		
 
 		leftDrive.set(speed);
+		System.out.println("Accessing setLeftSide");
 
 	}
 
@@ -321,7 +353,7 @@ public class Robot extends VisualRobot {
 	public void setRightSide(double speed) {
 
 		
-
+		System.out.println("Accessing setRightSide");
 		//Prevents speed from being set over max of 1
 
 		speed = speed > 1 ? 1 : speed;
@@ -331,6 +363,7 @@ public class Robot extends VisualRobot {
 		
 
 		rightDrive.set(speed);
+		System.out.println("Accessing setRightSide");
 
 	}
 
