@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
@@ -39,11 +40,13 @@ public class Robot extends VisualRobot {
 	Encoder rightEncoder;
 	/**Encoder elevatorEncoder;*/
 	ADXRS450_Gyro gyro;
-	/**DigitalInput limitIntakeClosed;*/
+	DigitalInput limitIntakeClosed;
 	
+		
 	
 	@Override
 	public void robotInit() {
+		
 		
 		//Joysticks Initialized
 		leftStick = new Joystick(1);
@@ -65,7 +68,7 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		/**elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
-		/**limitIntakeClosed = new DigitalInput(4);*/
+		limitIntakeClosed = new DigitalInput(4);
 		
 		//Distance per revolution - 256 pulse per revolution
 		leftEncoder.setDistancePerPulse(-6.0*Math.PI/256.0);
@@ -85,6 +88,7 @@ public class Robot extends VisualRobot {
 		
 		//Disable Safety
 		driveTrain.setSafetyEnabled(false);
+		
 	}
 	
 	
@@ -181,6 +185,8 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
+			
+			
 		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) {
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
@@ -198,8 +204,12 @@ public class Robot extends VisualRobot {
 			intakeGrab.set(0);
 		}
 		
-		//Outputs Encoder Values to DS
-		SmartDashboard.putString("DB/String 5", Double.toString(leftEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 6", Double.toString(rightEncoder.getDistance()));
+		
+		
+		//Outputs Values to DS
+		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 7", "Limit:" + Boolean.toString(!limitIntakeClosed.get()));
+		
 	}
 }
