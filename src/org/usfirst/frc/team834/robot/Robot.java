@@ -17,7 +17,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import visualrobot.ChooseAuton;
 import visualrobot.VisualRobot;
 
-
 public class Robot extends VisualRobot {
 
 	//Joysticks and DriveTrain Created
@@ -100,26 +99,40 @@ public class Robot extends VisualRobot {
 
 		try {
 			//Gets strings from SmartDashboard
-			String robotLocation = SmartDashboard.getString("DB/String 0", "default"); //Input is "Center", "Right", or "Left"
-			String goal = SmartDashboard.getString("DB/String 1", "default"); //Input is "Switch" or "Scale"
+			String robotLocation = SmartDashboard.getString("DB/String 0", ""); //Input is "Center", "Right", or "Left"
+			String goal = SmartDashboard.getString("DB/String 1", ""); //Input is "Switch" or "Scale"
 				
 			//Gets plate location from DS
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 				
 			//Initializes plateLocation for future use
-			char plateLocation; 
+			char plateLocation = '\0'; 
+			
+			//This is the auton file name that will run
+			String auton = "";
 				
 			//Selects the current plateLocation for the selected goal
 			if(goal.equalsIgnoreCase("switch")){
 				plateLocation = gameData.charAt(0);
-			}
-			else {
-				plateLocation = gameData.charAt(1);
-			}
 				
-			//Tells BuildAnAuton to play the corrrect auton	
+				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+				auton = robotLocation + goal + plateLocation;
+			}
+			else if(goal.equalsIgnoreCase("scale")) {
+				plateLocation = gameData.charAt(1);
+				
+				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+				auton = robotLocation + goal + plateLocation;
+			}
+			else {				
+				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+				auton = robotLocation;
+			}
+			
+			//Tells BuildAnAuton to play the correct auton	
 			ChooseAuton c = new ChooseAuton(this);
-			c.chooseAuton(robotLocation + goal + plateLocation); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+			c.run();
 		}
 		catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -131,14 +144,14 @@ public class Robot extends VisualRobot {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
 		
-		leftDrive.set(-speed);
+		leftDrive.set(speed);
 	}
 
 	public void setRightSide(double speed) {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
 		
-		rightDrive.set(speed);
+		rightDrive.set(-speed);
 	}
 	
 
@@ -152,12 +165,10 @@ public class Robot extends VisualRobot {
 	public void teleOpPeriodic() {
 
 		// Makes joysticks control drivetrain
-		/**driveTrain.tankDrive(leftStick, rightStick);*/
-		/**driveTrain.arcadeDrive(rightStick);*/
 		setRightSide(-rightStick.getY());
 		setLeftSide(-leftStick.getY());
 
-		// Makes xbox control elevator
+		// Makes xbox control elevator (-1 is up)
 		if (xbox.getRawButton(3)) {
 			elevator.set(1.0);
 		} else if (xbox.getRawButton(4)) {
@@ -166,7 +177,7 @@ public class Robot extends VisualRobot {
 			elevator.set(0);
 		}
 
-		//Button to pull in and push out the cube
+		//Button to pull in and push out the cube (2 is intakeIn)
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
@@ -178,7 +189,7 @@ public class Robot extends VisualRobot {
 			intakeRight.set(0);
 		}
 		
-		//Button to close or open the intake
+		//Button to close or open the intake (5 is closed)
 		if (xbox.getRawButton(5)) {   
 			intakeGrab.set(1.0);
 		} else if (xbox.getRawButton(6)) {
