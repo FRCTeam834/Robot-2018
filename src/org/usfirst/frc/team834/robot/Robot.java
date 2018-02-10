@@ -115,10 +115,8 @@ public class Robot extends VisualRobot {
 			ChooseAuton c = new ChooseAuton(this);
 
 			c.chooseAuton(robotLocation);
-			
+			/*
 			ArrayList<Command> t = c.cmdSet.getMain();
-
-			
 			System.out.println("Before Loop");
 			for(Command com : t) {
 System.out.println("In Loop");
@@ -129,7 +127,7 @@ System.out.println("Running MoveStraight");
 				}
 
 			}
-
+			*/
 			
 			
 			
