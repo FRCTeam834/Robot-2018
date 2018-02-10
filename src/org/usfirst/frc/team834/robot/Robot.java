@@ -1,15 +1,6 @@
 package org.usfirst.frc.team834.robot;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,17 +9,12 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import basicCommand.DelayCommand;
-
 import visualrobot.ChooseAuton;
-import visualrobot.Command;
-import visualrobot.MoveStraightCommand;
 import visualrobot.VisualRobot;
 
 
@@ -121,10 +107,10 @@ public class Robot extends VisualRobot {
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 				
 			//Initializes plateLocation for future use
-			String plateLocation = ""; 
+			char plateLocation; 
 				
 			//Selects the current plateLocation for the selected goal
-			if(priority.equalsIgnoreCase('switch')){
+			if(goal.equalsIgnoreCase("switch")){
 				plateLocation = gameData.charAt(0);
 			}
 			else {
@@ -168,8 +154,8 @@ public class Robot extends VisualRobot {
 		// Makes joysticks control drivetrain
 		/**driveTrain.tankDrive(leftStick, rightStick);*/
 		/**driveTrain.arcadeDrive(rightStick);*/
-		setRightSide(-rightJoystick.getY());
-		setLeftSide(-leftJoystick.getY());
+		setRightSide(-rightStick.getY());
+		setLeftSide(-leftStick.getY());
 
 		// Makes xbox control elevator
 		if (xbox.getRawButton(3)) {
@@ -202,7 +188,7 @@ public class Robot extends VisualRobot {
 		}
 		
 		//Outputs Encoder Values to DS
-		SmartDashboard.putString("DB/String 5", Double.toString("L01:"+leftEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 6", Double.toString("R23:"+rightEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 5", Double.toString(leftEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 6", Double.toString(rightEncoder.getDistance()));
 	}
 }

@@ -11,5 +11,6 @@
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar" sourcepath="/CTRE_Phoenix.sources"/>
 	<classpathentry kind="lib" path="/BuildAnAuton_2.0/Downloads/BuildAnAuton.jar"/>
 	<classpathentry kind="lib" path="/Users/dom/wpilib/user/java/lib/BuildAnAuton.jar"/>
+	<classpathentry kind="lib" path="C:/Users/BRANDONM-T530/wpilib/user/java/lib/BuildAnAuton (Apr 7 2017).jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
