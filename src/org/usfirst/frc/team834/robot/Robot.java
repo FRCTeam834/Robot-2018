@@ -187,8 +187,6 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
-			
-			
 		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) {
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
@@ -206,6 +204,16 @@ public class Robot extends VisualRobot {
 			intakeGrab.set(0);
 		}
 		
+		//Buttons that make your robot climb up and down
+		if(xbox.getRawButton(7)){ //Back Button
+			climber.set(1.0); //Extend
+		}
+		else if(xbox.getRawButton(8)){ //Start Button
+			climber.set(-1.0); //Retract (Robot goes up)
+		}
+		else{
+			climber.set(0);
+		}
 		
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
