@@ -1,12 +1,10 @@
 package org.usfirst.frc.team834.robot;
 
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
@@ -38,7 +36,7 @@ public class Robot extends VisualRobot {
 	//Encoders, Gyros, Sensors Created
 	Encoder leftEncoder;
 	Encoder rightEncoder;
-	/**Encoder elevatorEncoder;*/
+	/*Encoder elevatorEncoder;*/
 	ADXRS450_Gyro gyro;
 	DigitalInput limitIntakeClosed;
 	
@@ -66,7 +64,7 @@ public class Robot extends VisualRobot {
 		//Encoders, Gyros, Sensors Initialized
 		leftEncoder = new Encoder(0, 1);
 		rightEncoder = new Encoder(2, 3);
-		/**elevatorEncoder = new Encoder(4,5);*/
+		/*elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
 		limitIntakeClosed = new DigitalInput(4);
 		
@@ -77,9 +75,9 @@ public class Robot extends VisualRobot {
 		//Super Sensors and Motors
 		super.sensors.put("leftEncoder", leftEncoder);
 		super.sensors.put("rightEncoder", rightEncoder);
-		/**super.sensors.put("elevatorEncoder", elevatorEncoder);*/
+		/*super.sensors.put("elevatorEncoder", elevatorEncoder);*/
 		super.sensors.put("gyro", gyro);
-		/**super.sensors.put("limitIntakeClosed", limitIntakeClosed);*/
+		/*super.sensors.put("limitIntakeClosed", limitIntakeClosed);*/
 		
 		super.motors.put("elevator", elevator);
 		super.motors.put("intakeLeft", intakeLeft);
@@ -99,7 +97,7 @@ public class Robot extends VisualRobot {
 		gyro.calibrate();
 		leftEncoder.reset();
 		rightEncoder.reset();
-		/**elevatorEncoder.reset();*/
+		/*elevatorEncoder.reset();*/
 
 		try {
 			//Gets strings from SmartDashboard
@@ -169,6 +167,10 @@ public class Robot extends VisualRobot {
 	public void teleOpPeriodic() {
 
 		// Makes joysticks control drivetrain
+		/*
+		 * This should be used used instead of independently setting the right and left side:
+		 * driveTrain.tankDrive(leftSpeed, rightSpeed);
+		 */
 		setRightSide(-rightStick.getY());
 		setLeftSide(-leftStick.getY());
 
@@ -203,7 +205,6 @@ public class Robot extends VisualRobot {
 		} else {
 			intakeGrab.set(0);
 		}
-		
 		
 		
 		//Outputs Values to DS
