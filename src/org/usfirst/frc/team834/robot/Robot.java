@@ -87,6 +87,11 @@ public class Robot extends VisualRobot {
 		//Disable Safety
 		driveTrain.setSafetyEnabled(false);
 		
+		//Sensor Calibrate and Reset
+				gyro.calibrate();
+				leftEncoder.reset();
+				rightEncoder.reset();
+				/*elevatorEncoder.reset();*/
 	}
 	
 	
@@ -94,7 +99,7 @@ public class Robot extends VisualRobot {
 	public void autonomous() {
 
 		//Sensor Calibrate and Reset
-		gyro.calibrate();
+		/*gyro.calibrate();*/ //Takes 5 Seconds to Calibrate
 		leftEncoder.reset();
 		rightEncoder.reset();
 		/*elevatorEncoder.reset();*/
@@ -107,24 +112,28 @@ public class Robot extends VisualRobot {
 			//Gets plate location from DS
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 				
-			//Initializes plateLocation for future use
-			char plateLocation = '\0'; 
-			
 			//This is the auton file name that will run
 			String auton = "";
-				
+			
+			//This makes sure the correct auton will be selected regardless of inputed letter case
+			if(robotLocation.equalsIgnoreCase("left")) {
+				robotLocation = "Left";
+			}
+			else if(robotLocation.equalsIgnoreCase("right")) {
+				robotLocation = "Right";
+			}
+			else if(robotLocation.equalsIgnoreCase("center")) {
+				robotLocation = "Center";
+			}
+			
 			//Selects the current plateLocation for the selected goal
 			if(goal.equalsIgnoreCase("switch")){
-				plateLocation = gameData.charAt(0);
-				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
-				auton = robotLocation + goal + plateLocation;
+				auton = robotLocation + "Switch" + gameData.charAt(0);
 			}
-			else if(goal.equalsIgnoreCase("scale")) {
-				plateLocation = gameData.charAt(1);
-				
+			else if(goal.equalsIgnoreCase("scale")) {				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
-				auton = robotLocation + goal + plateLocation;
+				auton = robotLocation + "Scale" + gameData.charAt(1);
 			}
 			else {				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
@@ -167,12 +176,8 @@ public class Robot extends VisualRobot {
 	public void teleOpPeriodic() {
 
 		// Makes joysticks control drivetrain
-		/*
-		 * This should be used used instead of independently setting the right and left side:
-		 * driveTrain.tankDrive(leftSpeed, rightSpeed);
-		 */
-		setRightSide(-rightStick.getY());
-		setLeftSide(-leftStick.getY());
+		//This should be used used instead of independently setting the right and left side
+		driveTrain.tankDrive(-leftStick.getY(), -rightStick.getY());
 
 		// Makes xbox control elevator (-1 is up)
 		if (xbox.getRawButton(3)) {
@@ -187,8 +192,6 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
-			
-			
 		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) {
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
