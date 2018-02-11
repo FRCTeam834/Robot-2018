@@ -11,5 +11,10 @@
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar" sourcepath="/CTRE_Phoenix.sources"/>
 	<classpathentry kind="lib" path="/Users/dom/wpilib/user/java/lib/BuildAnAuton.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/BuildAnAuton.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/cscore.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRLib.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/NetworkTables.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/opencv.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/WPILib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -209,6 +209,16 @@ public class Robot extends VisualRobot {
 			intakeGrab.set(0);
 		}
 		
+		//Buttons that make your robot climb up and down
+		if(xbox.getRawButton(7)){ //Back Button
+			climber.set(1.0); //Extend
+		}
+		else if(xbox.getRawButton(8)){ //Start Button
+			climber.set(-1.0); //Retract (Robot goes up)
+		}
+		else{
+			climber.set(0);
+		}
 		
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
