@@ -1,18 +1,18 @@
 package org.usfirst.frc.team834.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import visualrobot.ChooseAuton;
 import visualrobot.VisualRobot;
 
@@ -181,28 +181,42 @@ public class Robot extends VisualRobot {
 
 		// Makes xbox control elevator (-1 is up)
 		if (xbox.getRawButton(3)) {
+			
 			elevator.set(1.0);
+			
 		} else if (xbox.getRawButton(4)) {
+			
 			elevator.set(-1.0);
+			
 		} else {
+			
 			elevator.set(0);
+			
 		}
 
 		//Button to pull in and push out the cube (2 is intakeIn)
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
+			xbox.setRumble(RumbleType.kLeftRumble, 1);
+			xbox.setRumble(RumbleType.kRightRumble, 1);
 		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) {
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
+			xbox.setRumble(RumbleType.kLeftRumble, 1);
+			xbox.setRumble(RumbleType.kRightRumble, 1);
 		} else {
 			intakeLeft.set(0);
 			intakeRight.set(0);
+			xbox.setRumble(RumbleType.kLeftRumble, 0);
+			xbox.setRumble(RumbleType.kRightRumble, 0);
 		}
 		
 		//Button to close or open the intake (5 is closed)
-		if (xbox.getRawButton(5)) {   
+		if (xbox.getRawButton(5)) { 
+			
 			intakeGrab.set(1.0);
+			
 		} else if (xbox.getRawButton(6)) {
 			intakeGrab.set(-1.0);
 		} else {
@@ -210,10 +224,10 @@ public class Robot extends VisualRobot {
 		}
 		
 		//Buttons that make your robot climb up and down
-		if(xbox.getRawButton(7)){ //Back Button
+		if(xbox.getRawButton(1)){ //Back Button
 			climber.set(1.0); //Extend
 		}
-		else if(xbox.getRawButton(8)){ //Start Button
+		else if(xbox.getRawButton(2 )){ //Start Button
 			climber.set(-1.0); //Retract (Robot goes up)
 		}
 		else{
@@ -227,3 +241,13 @@ public class Robot extends VisualRobot {
 		
 	}
 }
+
+
+
+
+/*			
+ * Krishna and Dom have some fun plans for the future :D
+ * xbox.setRumble(RumbleType.kLeftRumble, 1);
+ * xbox.setRumble(RumbleType.kRightRumble, 1);
+ */
+
