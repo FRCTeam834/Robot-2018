@@ -198,7 +198,8 @@ public class Robot extends VisualRobot {
 				
 			} else if (!limitElevatorHeight.get()) {
 				
-				elevator.set(0);
+				elevator.set(-.1);
+				
 			}
 			
 			
