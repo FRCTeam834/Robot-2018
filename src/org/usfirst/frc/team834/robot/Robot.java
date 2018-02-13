@@ -39,7 +39,7 @@ public class Robot extends VisualRobot {
 	/*Encoder elevatorEncoder;*/
 	ADXRS450_Gyro gyro;
 	DigitalInput limitIntakeClosed;
-	
+	DigitalInput limitElevatorHeight;
 		
 	
 	@Override
@@ -66,7 +66,8 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		/*elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
-		limitIntakeClosed = new DigitalInput(4);
+		limitIntakeClosed = new DigitalInput(5);
+		limitElevatorHeight = new DigitalInput(4);
 		
 		//Distance per revolution - 256 pulse per revolution
 		leftEncoder.setDistancePerPulse(-6.0*Math.PI/256.0);
@@ -184,43 +185,97 @@ public class Robot extends VisualRobot {
 			
 			elevator.set(1.0);
 			
+			
+			
+			
+			//elevator.set(1.0);
+			
 		} else if (xbox.getRawButton(4)) {
 			
-			elevator.set(-1.0);
+			if (limitElevatorHeight.get()) {
+				
+				elevator.set(-1.0);
+				
+			} else if (!limitElevatorHeight.get()) {
+				
+				elevator.set(0);
+			}
+			
+			
+			
+			//elevator.set(-1.0);
+			
+			
+			
+			
 			
 		} else {
+			
 			
 			elevator.set(0);
 			
 		}
 
+		
+		
+		
+		
 		//Button to pull in and push out the cube (2 is intakeIn)
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
-			xbox.setRumble(RumbleType.kLeftRumble, 1);
-			xbox.setRumble(RumbleType.kRightRumble, 1);
+
+			
+			
 		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) {
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
-			xbox.setRumble(RumbleType.kLeftRumble, 1);
-			xbox.setRumble(RumbleType.kRightRumble, 1);
+
+			
 		} else {
 			intakeLeft.set(0);
 			intakeRight.set(0);
-			xbox.setRumble(RumbleType.kLeftRumble, 0);
-			xbox.setRumble(RumbleType.kRightRumble, 0);
+
+			
+			
 		}
 		
 		//Button to close or open the intake (5 is closed)
 		if (xbox.getRawButton(5)) { 
 			
+			if (!limitIntakeClosed.get()) {
+				
+				xbox.setRumble(RumbleType.kLeftRumble, 1);
+				xbox.setRumble(RumbleType.kRightRumble, 1);
+				
+			} else {
+				xbox.setRumble(RumbleType.kLeftRumble, 0);
+				xbox.setRumble(RumbleType.kRightRumble, 0);
+			}
+			
 			intakeGrab.set(1.0);
 			
 		} else if (xbox.getRawButton(6)) {
+			
+			if (!limitIntakeClosed.get()) {
+				
+				xbox.setRumble(RumbleType.kLeftRumble, 1);
+				xbox.setRumble(RumbleType.kRightRumble, 1);
+				
+			} else {
+				xbox.setRumble(RumbleType.kLeftRumble, 0);
+				xbox.setRumble(RumbleType.kRightRumble, 0);
+			}
+			
 			intakeGrab.set(-1.0);
+			
+			
 		} else {
+			
 			intakeGrab.set(0);
+			xbox.setRumble(RumbleType.kLeftRumble, 0);
+			xbox.setRumble(RumbleType.kRightRumble, 0);
+			
 		}
 		
 		//Buttons that make your robot climb up and down
@@ -233,7 +288,13 @@ public class Robot extends VisualRobot {
 		else{
 			climber.set(0);
 		}
-		
+	/*	
+		if (!limitElevatorHeight.get()) {
+			
+			elevator.set(0);
+			
+		}
+		*/
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
