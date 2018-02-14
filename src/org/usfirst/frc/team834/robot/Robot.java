@@ -114,8 +114,18 @@ public class Robot extends VisualRobot {
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 				
 			//This is the auton file name that will run
-			String auton = "";
 			
+			
+			
+			
+			String auton = "test";
+			
+			
+			
+			
+			
+			
+			/*
 			//This makes sure the correct auton will be selected regardless of inputed letter case
 			if(robotLocation.equalsIgnoreCase("left")) {
 				robotLocation = "Left";
@@ -140,7 +150,7 @@ public class Robot extends VisualRobot {
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation;
 			}
-			
+			*/
 			//Tells BuildAnAuton to play the correct auton	
 			ChooseAuton c = new ChooseAuton(this);
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
@@ -184,10 +194,6 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawButton(3)) {
 			
 			elevator.set(1.0);
-			
-			
-			
-			
 			//elevator.set(1.0);
 			
 		} else if (xbox.getRawButton(4)) {
@@ -202,24 +208,19 @@ public class Robot extends VisualRobot {
 				
 			}
 			
-			
-			
 			//elevator.set(-1.0);
 			
+		} else if (xbox.getRawButton(8)) { //  Start button stops elevator and holds in place from da gravityies
 			
+			elevator.set(-.1);
 			
-			
-			
-		} else {
-			
-			
+		}
+		
+		else {
 			elevator.set(0);
 			
 		}
 
-		
-		
-		
 		
 		//Button to pull in and push out the cube (2 is intakeIn)
 		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) {
@@ -237,7 +238,6 @@ public class Robot extends VisualRobot {
 			intakeLeft.set(0);
 			intakeRight.set(0);
 
-			
 			
 		}
 		
@@ -266,6 +266,7 @@ public class Robot extends VisualRobot {
 			} else {
 				xbox.setRumble(RumbleType.kLeftRumble, 0);
 				xbox.setRumble(RumbleType.kRightRumble, 0);
+				
 			}
 			
 			intakeGrab.set(-1.0);
@@ -277,6 +278,7 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 			
+		
 		}
 		
 		//Buttons that make your robot climb up and down
@@ -299,11 +301,27 @@ public class Robot extends VisualRobot {
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 7", "Limit:" + Boolean.toString(!limitIntakeClosed.get()));
+		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntakeClosed.get()));
+		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorHeight.get()));
+
+
+		
+		
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 	}
 }
-
 
 
 
