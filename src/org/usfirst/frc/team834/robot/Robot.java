@@ -114,18 +114,8 @@ public class Robot extends VisualRobot {
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
 				
 			//This is the auton file name that will run
+			String auton = "";
 			
-			
-			
-			
-			String auton = "test";
-			
-			
-			
-			
-			
-			
-			/*
 			//This makes sure the correct auton will be selected regardless of inputed letter case
 			if(robotLocation.equalsIgnoreCase("left")) {
 				robotLocation = "Left";
@@ -150,7 +140,12 @@ public class Robot extends VisualRobot {
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation;
 			}
-			*/
+			
+			//Checks if using overrided file
+			if (!SmartDashboard.getString("DB/String 4", "").isEmpty()) {
+				auton = SmartDashboard.getString("DB/String 4", "");
+			}
+			
 			//Tells BuildAnAuton to play the correct auton	
 			ChooseAuton c = new ChooseAuton(this);
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
@@ -263,13 +258,16 @@ public class Robot extends VisualRobot {
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
 				
+				intakeGrab.set(-.1);
+				
 			} else {
 				xbox.setRumble(RumbleType.kLeftRumble, 0);
 				xbox.setRumble(RumbleType.kRightRumble, 0);
 				
+				intakeGrab.set(-1.0);
 			}
 			
-			intakeGrab.set(-1.0);
+			//intakeGrab.set(-1.0);
 			
 			
 		} else {
@@ -278,7 +276,19 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 			
-		
+			if (leftStick.getRawButton(1)) {
+				
+				xbox.setRumble(RumbleType.kLeftRumble, 1);
+				xbox.setRumble(RumbleType.kRightRumble, 1);
+				
+			}
+			
+			else {
+				
+				xbox.setRumble(RumbleType.kLeftRumble, 0);
+				xbox.setRumble(RumbleType.kRightRumble, 0);
+				
+			}
 		}
 		
 		//Buttons that make your robot climb up and down
