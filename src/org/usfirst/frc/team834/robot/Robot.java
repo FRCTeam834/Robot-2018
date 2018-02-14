@@ -41,7 +41,7 @@ public class Robot extends VisualRobot {
 	DigitalInput limitIntakeClosed;
 	DigitalInput limitElevatorHeight;
 		
-	
+	String aUselessVariable;
 	@Override
 	public void robotInit() {
 		
@@ -156,7 +156,6 @@ public class Robot extends VisualRobot {
 		}
 	}
 
-	
 	public void setLeftSide(double speed) {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
