@@ -42,6 +42,9 @@ public class Robot extends VisualRobot {
 	DigitalInput limitElevatorHeight;
 		
 	String aUselessVariable;
+	RumbleType kRightRumble;
+	RumbleType kLeftRumble;
+	
 	@Override
 	public void robotInit() {
 		
@@ -141,11 +144,6 @@ public class Robot extends VisualRobot {
 				auton = robotLocation;
 			}
 			
-			//Checks if using overrided file
-			if (!SmartDashboard.getString("DB/String 4", "").isEmpty()) {
-				auton = SmartDashboard.getString("DB/String 4", "");
-			}
-			
 			//Tells BuildAnAuton to play the correct auton	
 			ChooseAuton c = new ChooseAuton(this);
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
@@ -240,12 +238,23 @@ public class Robot extends VisualRobot {
 			
 			if (!limitIntakeClosed.get()) {
 				
-				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);
+				xbox.setRumble(kLeftRumble, 1);
+				xbox.setRumble(kRightRumble, 1);
 				
 			} else {
-				xbox.setRumble(RumbleType.kLeftRumble, 0);
-				xbox.setRumble(RumbleType.kRightRumble, 0);
+				xbox.setRumble(kLeftRumble, 0);
+				xbox.setRumble(kRightRumble, 0);
+				
+				if (xbox.getRawAxis(4) >= 75) {
+					
+					xbox.setRumble(kLeftRumble, 1);
+					xbox.setRumble(kRightRumble, 1);
+					
+				} else { 
+					
+					xbox.setRumble(kLeftRumble, 0);
+					xbox.setRumble(kRightRumble, 0);
+				}
 			}
 			
 			intakeGrab.set(1.0);
@@ -257,7 +266,7 @@ public class Robot extends VisualRobot {
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
 				
-				intakeGrab.set(-.1);
+				intakeGrab.set(-1.0);
 				
 			} else {
 				xbox.setRumble(RumbleType.kLeftRumble, 0);
@@ -307,22 +316,14 @@ public class Robot extends VisualRobot {
 			
 		}
 		*/
+		
+
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntakeClosed.get()));
 		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorHeight.get()));
 
-
-		
-		
-		
-
-		
-		
-		
-		
-		
 		
 		
 		
