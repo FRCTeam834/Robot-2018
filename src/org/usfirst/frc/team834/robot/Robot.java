@@ -38,8 +38,8 @@ public class Robot extends VisualRobot {
 	Encoder rightEncoder;
 	/*Encoder elevatorEncoder;*/
 	ADXRS450_Gyro gyro;
-	DigitalInput limitIntakeClosed;
-	DigitalInput limitElevatorHeight;
+	DigitalInput limitIntake;
+	DigitalInput limitElevatorTop;
 		
 	String aUselessVariable;
 	RumbleType kRightRumble;
@@ -69,8 +69,8 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		/*elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
-		limitIntakeClosed = new DigitalInput(5);
-		limitElevatorHeight = new DigitalInput(4);
+		limitIntake = new DigitalInput(5);
+		limitElevatorTop = new DigitalInput(4);
 		
 		//Distance per revolution - 256 pulse per revolution
 		//leftEncoder.setDistancePerPulse(2*-6.0*Math.PI/256.0)
@@ -83,8 +83,8 @@ public class Robot extends VisualRobot {
 		/*super.sensors.put("elevatorEncoder", elevatorEncoder);*/
 		super.sensors.put("gyro", gyro);
 		/*super.sensors.put("limitIntakeClosed", limitIntakeClosed);*/
-		super.sensors.put("limitElevatorHeight", limitElevatorHeight);
-		super.sensors.put("limitIntakeClosed", limitIntakeClosed);
+		super.sensors.put("limitElevatorHeight", limitElevatorTop);
+		super.sensors.put("limitIntakeClosed", limitIntake);
 		
 		super.motors.put("elevator", elevator);
 		super.motors.put("intakeLeft", intakeLeft);
@@ -193,11 +193,11 @@ public class Robot extends VisualRobot {
 			
 		} else if (xbox.getRawButton(4)) { //Y/Elevator Up
 			
-			if (limitElevatorHeight.get()) {
+			if (limitElevatorTop.get()) {
 				
 				elevator.set(-1.0);
 				
-			} else if (!limitElevatorHeight.get()) {
+			} else if (!limitElevatorTop.get()) {
 				
 				elevator.set(-.1);
 				
@@ -239,7 +239,7 @@ public class Robot extends VisualRobot {
 		//Button to close or open the intake (5 is closed)
 		if (xbox.getRawButton(5)) { //Left Shoulder
 			
-			if (!limitIntakeClosed.get()) {
+			if (!limitIntake.get()) {
 				
 				xbox.setRumble(kLeftRumble, 1);
 				xbox.setRumble(kRightRumble, 1);
@@ -264,7 +264,7 @@ public class Robot extends VisualRobot {
 			
 		} else if (xbox.getRawButton(6)) {//Right Shoulder
 			
-			if (!limitIntakeClosed.get()) {
+			if (!limitIntake.get()) {
 				
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
@@ -325,8 +325,8 @@ public class Robot extends VisualRobot {
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntakeClosed.get()));
-		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorHeight.get()));
+		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntake.get()));
+		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorTop.get()));
 
 		
 		
