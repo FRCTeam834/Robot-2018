@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import visualrobot.ChooseAuton;
 import visualrobot.VisualRobot;
+
 
 public class Robot extends VisualRobot {
 
@@ -41,17 +43,15 @@ public class Robot extends VisualRobot {
 	DigitalInput limitIntake;
 	DigitalInput limitElevatorTop;
 		
-	String aUselessVariable;
 	RumbleType kRightRumble;
 	RumbleType kLeftRumble;
 	
 	@Override
 	public void robotInit() {
 		
-		
 		//Joysticks Initialized
-		leftStick = new Joystick(1);
-		rightStick = new Joystick(0);
+		leftStick = new Joystick(0);
+		rightStick = new Joystick(1);
 		xbox = new Joystick(2);
 		
 		//Speed Controllers and driveTrain Initialized
@@ -69,11 +69,10 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		/*elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
-		limitIntake = new DigitalInput(5);
-		limitElevatorTop = new DigitalInput(4);
+		limitIntake = new DigitalInput(4);
+		limitElevatorTop = new DigitalInput(5);
 		
 		//Distance per revolution - 256 pulse per revolution
-		//leftEncoder.setDistancePerPulse(2*-6.0*Math.PI/256.0)
 		leftEncoder.setDistancePerPulse(-6.0*Math.PI/256.0);
 		rightEncoder.setDistancePerPulse(6.0*Math.PI/256.0);
 
@@ -82,9 +81,8 @@ public class Robot extends VisualRobot {
 		super.sensors.put("rightEncoder", rightEncoder);
 		/*super.sensors.put("elevatorEncoder", elevatorEncoder);*/
 		super.sensors.put("gyro", gyro);
-		/*super.sensors.put("limitIntakeClosed", limitIntakeClosed);*/
-		super.sensors.put("limitElevatorHeight", limitElevatorTop);
-		super.sensors.put("limitIntakeClosed", limitIntake);
+		super.sensors.put("limitIntake", limitIntake);
+		super.sensors.put("limitElevatorTop", limitElevatorTop);
 		
 		super.motors.put("elevator", elevator);
 		super.motors.put("intakeLeft", intakeLeft);
@@ -95,10 +93,10 @@ public class Robot extends VisualRobot {
 		driveTrain.setSafetyEnabled(false);
 		
 		//Sensor Calibrate and Reset
-				gyro.calibrate();
-				leftEncoder.reset();
-				rightEncoder.reset();
-				/*elevatorEncoder.reset();*/
+		gyro.calibrate();
+		leftEncoder.reset();
+		rightEncoder.reset();
+		/*elevatorEncoder.reset();*/
 	}
 	
 	
@@ -106,7 +104,6 @@ public class Robot extends VisualRobot {
 	public void autonomous() {
 
 		//Sensor Calibrate and Reset
-		/*gyro.calibrate();*/ //Takes 5 Seconds to Calibrate
 		leftEncoder.reset();
 		rightEncoder.reset();
 		/*elevatorEncoder.reset();*/
@@ -123,13 +120,11 @@ public class Robot extends VisualRobot {
 			String auton = "";
 			
 			//This makes sure the correct auton will be selected regardless of inputed letter case
-			if(robotLocation.equalsIgnoreCase("left")) {
+			if(robotLocation.equalsIgnoreCase("left")){
 				robotLocation = "Left";
-			}
-			else if(robotLocation.equalsIgnoreCase("right")) {
+			}else if(robotLocation.equalsIgnoreCase("right")){
 				robotLocation = "Right";
-			}
-			else if(robotLocation.equalsIgnoreCase("center")) {
+			}else if(robotLocation.equalsIgnoreCase("center")){
 				robotLocation = "Center";
 			}
 			
@@ -137,12 +132,10 @@ public class Robot extends VisualRobot {
 			if(goal.equalsIgnoreCase("switch")){
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Switch" + gameData.charAt(0);
-			}
-			else if(goal.equalsIgnoreCase("scale")) {				
+			}else if(goal.equalsIgnoreCase("scale")){				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Scale" + gameData.charAt(1);
-			}
-			else {				
+			}else{				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation;
 			}
@@ -154,29 +147,30 @@ public class Robot extends VisualRobot {
 		}
 		catch(Exception e) {
 			System.out.println(e.getMessage());
+			
+			//Will run base line auton in case of error	
+			ChooseAuton c = new ChooseAuton(this);
+			c.chooseAuton("Straight"); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
+			c.run();
 		}
 	}
 
 	public void setLeftSide(double speed) {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
-		
 		leftDrive.set(speed);
 	}
 
 	public void setRightSide(double speed) {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
-		
 		rightDrive.set(-speed);
 	}
-	
 
 	@Override
 	public void teleOpInit() {
 
 	}
-
 
 	@Override
 	public void teleOpPeriodic() {
@@ -186,162 +180,70 @@ public class Robot extends VisualRobot {
 		driveTrain.tankDrive(-leftStick.getY(), -rightStick.getY());
 
 		// Makes xbox control elevator (-1 is up)
-		if (xbox.getRawButton(3)) { //X/Elevator Down
-			
-			elevator.set(1.0);
-			//elevator.set(1.0);
-			
-		} else if (xbox.getRawButton(4)) { //Y/Elevator Up
-			
-			if (limitElevatorTop.get()) {
-				
+		if(xbox.getRawButton(3)){ //X = Elevator Down
+			elevator.set(1.0);			
+		}else if(xbox.getRawButton(4)){ //Y = Elevator Up
+			if(limitElevatorTop.get()){
 				elevator.set(-1.0);
-				
-			} else if (!limitElevatorTop.get()) {
-				
-				elevator.set(-.1);
-				
-			}
-			
-			//elevator.set(-1.0);
-			
-		} else if (xbox.getRawButton(8)) { //  Start button stops elevator and holds in place from da gravityies
-			
-			elevator.set(-.1);
-			
+			}else if(!limitElevatorTop.get()){
+				elevator.set(0);
+			}			
+		}else{
+			elevator.set(SmartDashboard.getNumber("DB/String 4", 0)); //Lets test what force needs to be applied to be balanced with gravity
 		}
 		
-		else {
-			elevator.set(0);
-			
-		}
-
-		
-		//Button to pull in and push out the cube (2 is intakeIn)
-		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) { //Left Trigger
+		//Button to pull in and push out the cube (-1 is in)
+		if(xbox.getRawAxis(2) >= 0.75){ //Left Trigger = In
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
-
-			
-			
-		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) { //Right Trigger
+		}else if(xbox.getRawAxis(3) >= 0.75){ //Right Trigger
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
-
-			
-		} else {
+		}else{
 			intakeLeft.set(0);
 			intakeRight.set(0);
-
-			
 		}
 		
-		//Button to close or open the intake (5 is closed)
-		if (xbox.getRawButton(5)) { //Left Shoulder
-			
-			if (!limitIntake.get()) {
-				
+		//Button to close or open the intake (1 is close)
+		if(xbox.getRawButton(5)){ //Left Bumper
+			if(!limitIntake.get()){
 				xbox.setRumble(kLeftRumble, 1);
 				xbox.setRumble(kRightRumble, 1);
-				
-			} else {
+			}else{
 				xbox.setRumble(kLeftRumble, 0);
 				xbox.setRumble(kRightRumble, 0);
-				
-				/*if (xbox.getRawAxis(4) >= 75) {
-					
-					xbox.setRumble(kLeftRumble, 1);
-					xbox.setRumble(kRightRumble, 1);
-					
-				} else { 
-					
-					xbox.setRumble(kLeftRumble, 0);
-					xbox.setRumble(kRightRumble, 0);
-				}*/
 			}
-			
 			intakeGrab.set(1.0);
-			
-		} else if (xbox.getRawButton(6)) {//Right Shoulder
-			
-			if (!limitIntake.get()) {
-				
+		}else if(xbox.getRawButton(6)){ //Right Bumper
+			if(!limitIntake.get()){
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
-				
-				intakeGrab.set(-1.0);
-				
-			} else {
+			}else{
 				xbox.setRumble(RumbleType.kLeftRumble, 0);
 				xbox.setRumble(RumbleType.kRightRumble, 0);
-				
-				intakeGrab.set(-1.0);
-			}
-			
-			//intakeGrab.set(-1.0);
-			
-			
-		} else {
-			
-			//Resets if nothing is pressed
+			}			
+			intakeGrab.set(-1.0);
+		}else{ //Resets if nothing is pressed
 			intakeGrab.set(0);
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
-			
-			if (leftStick.getRawButton(1)) {
-				
-				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);
-				
-			}
-			
-			else {
-				
-				xbox.setRumble(RumbleType.kLeftRumble, 0);
-				xbox.setRumble(RumbleType.kRightRumble, 0);
-				
-			}
 		}
 		
-		//Buttons that make your robot climb up and down
-		if(xbox.getRawButton(1)){ //A/Climb Down
-			climber.set(1.0); //Extend
-		}
-		else if(xbox.getRawButton(2 )){ //B/Climb Up
-			climber.set(-1.0); //Retract (Robot goes up)
-		}
-		else{
+		//Buttons that make your robot climb up and down (-1 is up)
+		if(xbox.getRawButton(1)){ //A = Climber Down
+			climber.set(1.0);
+		}else if(xbox.getRawButton(2)){ //B = Climber Up
+			climber.set(-1.0); 
+		}else{
 			climber.set(0);
 		}
-	/*	
-		if (!limitElevatorHeight.get()) {
-			
-			elevator.set(0);
-			
-		}
-		*/
 		
-
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 5", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 6", "Right:" + Double.toString(rightEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntake.get()));
 		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorTop.get()));
 
-		
-		
-		
-		
-		
-		
 	}
 }
-
-
-
-/*			
- * Krishna and Dom have some fun plans for the future :D
- * xbox.setRumble(RumbleType.kLeftRumble, 1);
- * xbox.setRumble(RumbleType.kRightRumble, 1);
- */
 
