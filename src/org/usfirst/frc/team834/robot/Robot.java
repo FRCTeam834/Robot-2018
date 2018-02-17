@@ -18,13 +18,16 @@ import visualrobot.VisualRobot;
 
 public class Robot extends VisualRobot {
 
+	
 	//Joysticks and DriveTrain Created
 	DifferentialDrive driveTrain;
 	Joystick leftStick;
 	Joystick rightStick;
 	Joystick xbox;
+	//Joysticks and DriveTrain Created
 	
-	//Speed Controllers Created
+	
+	//Speed Controllers and Intakes Created
 	SpeedControllerGroup leftDrive;
 	SpeedControllerGroup rightDrive;
 	SpeedController elevator;
@@ -32,18 +35,25 @@ public class Robot extends VisualRobot {
 	Talon intakeLeft;
 	Talon intakeRight;
 	Talon intakeGrab;
+	//Speed Controllers and Intakes Created
 	
-	//Encoders, Gyros, Sensors Created
+	
+	//Encoders, Gyro, and Limit Switches Created
 	Encoder leftEncoder;
 	Encoder rightEncoder;
-	/*Encoder elevatorEncoder;*/
 	ADXRS450_Gyro gyro;
 	DigitalInput limitIntake;
 	DigitalInput limitElevatorTop;
-		
+	//Encoders, Gyro, and Limit Switches Created
+	
+	
+	//Other creations that do stuff
 	String aUselessVariable;
 	RumbleType kRightRumble;
 	RumbleType kLeftRumble;
+	//Other creations that do stuff
+	
+	
 	
 	@Override
 	public void robotInit() {
@@ -53,8 +63,10 @@ public class Robot extends VisualRobot {
 		leftStick = new Joystick(1);
 		rightStick = new Joystick(0);
 		xbox = new Joystick(2);
+		//Joysticks Initialized
 		
-		//Speed Controllers and driveTrain Initialized
+		
+		//Drive Trains, Speed Controllers, and More Motors Initialized
 		leftDrive = new SpeedControllerGroup(new WPI_TalonSRX(1), new WPI_TalonSRX(2), new WPI_TalonSRX(3));
 		rightDrive = new SpeedControllerGroup(new WPI_TalonSRX(4),new WPI_TalonSRX(5), new WPI_TalonSRX(6));
 		driveTrain = new DifferentialDrive(leftDrive, rightDrive);
@@ -63,54 +75,70 @@ public class Robot extends VisualRobot {
 		intakeLeft = new Talon(0);//TalonSR PWM0
 		intakeRight = new Talon(1);//TalonSR PWM1
 		intakeGrab = new Talon(2);//TalonSR PWM2
+		//Drive Trains, Speed Controllers, and More Motors Initialized
 		
-		//Encoders, Gyros, Sensors Initialized
+		
+		//Encoders, Gyro, and Limit Switches Initialized
 		leftEncoder = new Encoder(0, 1);
 		rightEncoder = new Encoder(2, 3);
-		/*elevatorEncoder = new Encoder(4,5);*/
 		gyro = new ADXRS450_Gyro();
 		limitIntake = new DigitalInput(5);
 		limitElevatorTop = new DigitalInput(4);
+		//Encoders, Gyro, and Limit Switches Initialized
 		
+		
+		//DistancePerPulse Set
 		//Distance per revolution - 256 pulse per revolution
 		//leftEncoder.setDistancePerPulse(2*-6.0*Math.PI/256.0)
 		leftEncoder.setDistancePerPulse(-6.0*Math.PI/256.0);
 		rightEncoder.setDistancePerPulse(6.0*Math.PI/256.0);
+		//DistancePerPulse Set
 
-		//Super Sensors and Motors
+		
+		//Super Sensors and Motors for BuildAnAuton
 		super.sensors.put("leftEncoder", leftEncoder);
 		super.sensors.put("rightEncoder", rightEncoder);
-		/*super.sensors.put("elevatorEncoder", elevatorEncoder);*/
+		//super.sensors.put("elevatorEncoder", elevatorEncoder);
 		super.sensors.put("gyro", gyro);
-		/*super.sensors.put("limitIntakeClosed", limitIntakeClosed);*/
+		//super.sensors.put("limitIntakeClosed", limitIntakeClosed);
 		super.sensors.put("limitElevatorHeight", limitElevatorTop);
 		super.sensors.put("limitIntakeClosed", limitIntake);
-		
 		super.motors.put("elevator", elevator);
 		super.motors.put("intakeLeft", intakeLeft);
 		super.motors.put("intakeRight", intakeRight);
 		super.motors.put("intakeGrab", intakeGrab);
+		//Super Sensors and Motors for BuildAnAuton
+		
 		
 		//Disable Safety
 		driveTrain.setSafetyEnabled(false);
+		//Disable Safety
 		
-		//Sensor Calibrate and Reset
-				gyro.calibrate();
-				leftEncoder.reset();
-				rightEncoder.reset();
-				/*elevatorEncoder.reset();*/
+		
+		//Sensors Calibrated and Reset
+		gyro.calibrate();
+		leftEncoder.reset();
+		rightEncoder.reset();
+		//Sensors Calibrated and Reset
 	}
 	
 	
+	
 	@Override
-	public void autonomous() {
-
+	public void autonomous() { 
+		
+		//Everything below runs and chooses an auton
+		
+		
 		//Sensor Calibrate and Reset
 		/*gyro.calibrate();*/ //Takes 5 Seconds to Calibrate
-		leftEncoder.reset();
+		leftEncoder.reset(); 
 		rightEncoder.reset();
 		/*elevatorEncoder.reset();*/
+		//Sensors Calibrate and Reset
+		
 
+		//Chooses an auton based on the input on the smart dashboard and game data
 		try {
 			//Gets strings from SmartDashboard
 			String robotLocation = SmartDashboard.getString("DB/String 0", ""); //Input is "Center", "Right", or "Left"
@@ -155,15 +183,25 @@ public class Robot extends VisualRobot {
 		catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
+		//Done choosing an auton and running it
 	}
 
+	
+	
 	public void setLeftSide(double speed) {
+		
+		//Used during build an auton to make sure speed doesn't go above 1
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
+		//Used during build an auton to make sure speed doesn't go above 1
+	
 		
 		leftDrive.set(speed);
+		
+		
 	}
 
+	
 	public void setRightSide(double speed) {
 		speed = speed > 1 ? 1 : speed;
 		speed = speed < -1 ? -1 : speed;
@@ -218,21 +256,50 @@ public class Robot extends VisualRobot {
 
 		
 		//Button to pull in and push out the cube (2 is intakeIn)
-		if (xbox.getRawAxis(2) >= 0.75 /*xbox.getRawButton(2)*/) { //Left Trigger
+		if (xbox.getRawAxis(2) >= 0.75) { //Left Trigger
 			intakeLeft.set(-1.0);
 			intakeRight.set(-1.0);
 
 			
 			
-		} else if (xbox.getRawAxis(3) >= 0.75 /*xbox.getRawButton(3)*/) { //Right Trigger
+		} else if (xbox.getRawAxis(3) >= 0.75) { //Right Trigger
 			intakeLeft.set(1.0);
 			intakeRight.set(1.0);
-
+			
 			
 		} else {
 			intakeLeft.set(0);
 			intakeRight.set(0);
 		}
+		
+		//Testing the little spinny thingies on the xbox controller!
+		if (xbox.getRawAxis(0) >= 0.75) { //Left Trigger
+			xbox.setRumble(RumbleType.kLeftRumble, 1);
+			xbox.setRumble(RumbleType.kRightRumble, 1);
+			
+			
+		} else if (xbox.getRawAxis(1) >= 0.75) { //Right Trigger
+			xbox.setRumble(RumbleType.kLeftRumble, 1);
+			xbox.setRumble(RumbleType.kRightRumble, 1);
+
+			
+		} else {
+			xbox.setRumble(RumbleType.kLeftRumble, 0);
+			xbox.setRumble(RumbleType.kRightRumble, 0);
+			
+			
+		}
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		//Button to close or open the intake (5 is closed)
 		if (xbox.getRawButton(5)) { //Left Shoulder
