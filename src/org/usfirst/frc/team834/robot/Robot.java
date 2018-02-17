@@ -414,11 +414,7 @@ public class Robot extends VisualRobot {
 		SmartDashboard.putString("DB/String 7", "LimitIntake:" + Boolean.toString(!limitIntake.get()));
 		SmartDashboard.putString("DB/String 8", "LimitElevator:" + Boolean.toString(!limitElevatorTop.get()));
 
-		
-		
-		
-		
-		
+
 		
 	}
 }
