@@ -48,13 +48,8 @@ public class Robot extends VisualRobot {
 	
 	
 	//Other creations that do stuff
-	String aUselessVariable;
-
-	//Other creations that do stuff
 	
-	
-	
-	
+		
 	@Override
 	public void robotInit() {
 		
