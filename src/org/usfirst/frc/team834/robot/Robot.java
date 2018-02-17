@@ -199,7 +199,7 @@ public class Robot extends VisualRobot {
 				
 			} else if (!limitElevatorTop.get()) {
 				
-				elevator.set(-.1);
+				elevator.set(-1.0); //SET TO (-.1)
 				
 			}
 			
@@ -232,8 +232,6 @@ public class Robot extends VisualRobot {
 		} else {
 			intakeLeft.set(0);
 			intakeRight.set(0);
-
-			
 		}
 		
 		//Button to close or open the intake (5 is closed)
@@ -248,7 +246,7 @@ public class Robot extends VisualRobot {
 				xbox.setRumble(kLeftRumble, 0);
 				xbox.setRumble(kRightRumble, 0);
 				
-				/*if (xbox.getRawAxis(4) >= 75) {
+				if (xbox.getRawAxis(5) >= 75) {
 					
 					xbox.setRumble(kLeftRumble, 1);
 					xbox.setRumble(kRightRumble, 1);
@@ -257,12 +255,14 @@ public class Robot extends VisualRobot {
 					
 					xbox.setRumble(kLeftRumble, 0);
 					xbox.setRumble(kRightRumble, 0);
-				}*/
+				}
 			}
 			
 			intakeGrab.set(1.0);
 			
 		} else if (xbox.getRawButton(6)) {//Right Shoulder
+		
+			
 			
 			if (!limitIntake.get()) {
 				
@@ -288,18 +288,23 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 			
-			if (leftStick.getRawButton(1)) {
+			if (leftStick.getRawButton(7)) {
 				
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);
+				xbox.setRumble(RumbleType.kRightRumble, 0);
 				
 			}
 			
-			else {
+			else if (rightStick.getRawButton(7)){
 				
 				xbox.setRumble(RumbleType.kLeftRumble, 0);
-				xbox.setRumble(RumbleType.kRightRumble, 0);
+				xbox.setRumble(RumbleType.kRightRumble, 1);
 				
+			} else {
+		
+				xbox.setRumble(kLeftRumble, 0);
+				xbox.setRumble(kRightRumble, 0);
+			
 			}
 		}
 		
