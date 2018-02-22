@@ -45,7 +45,7 @@ public class Robot extends VisualRobot {
 	Encoder rightEncoder;
 	//Encoder elevatorEncoder;
 	ADXRS450_Gyro gyro;
-	//DigitalInput limitElevatorBottom;
+	DigitalInput limitElevatorBottom;
 	//DigitalInput photoEye;
 	//Encoders, Gyro, and Limit Switches Created
 	
@@ -83,8 +83,8 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		//elevatorEncoder = new Encoder(4, 5);
 		gyro = new ADXRS450_Gyro();
-		//limitElevatorBottom = new DigitalInput(6);
-		//photoEye = new DigitalInput(6);
+		limitElevatorBottom = new DigitalInput(6);
+		//photoEye = new DigitalInput(7);
 		//Encoders, Gyro, and Limit Switches Initialized
 		
 		
@@ -100,7 +100,7 @@ public class Robot extends VisualRobot {
 		super.sensors.put("rightEncoder", rightEncoder);
 		//super.sensors.put("elevatorEncoder", elevatorEncoder);
 		super.sensors.put("gyro", gyro);
-		//super.sensors.put("limitElevatorBottom", limitElevatorBottom);
+		super.sensors.put("limitElevatorBottom", limitElevatorBottom);
 		super.motors.put("elevator", elevator);
 		super.motors.put("intakeWheels", intakeWheels);
 		super.motors.put("intakeGrab", intakeGrab);
@@ -247,9 +247,9 @@ public class Robot extends VisualRobot {
 			elevator.set(1.0);
 		}
 		else if (xbox.getRawButton(3)) { //X button (Down)
-			/** Implement Limit Switch 
+			// Implement Limit Switch 
 			//The if statement below checks to see if the elevator is at it's minimum
-			if (	) { //If Pressed
+			if (!limitElevatorBottom.get()) { //If Pressed
 				//Sets the elevator to keep position when the limit switch is pressed
 				elevator.set(0.1);	
 				//Run Rumble
@@ -260,8 +260,6 @@ public class Robot extends VisualRobot {
 				//Sets the elevator to go down
 				elevator.set(-1.0);
 			}
-			*/
-			elevator.set(-1.0);
 		} 
 		/**
 		else if (xbox.getRawButton(100)) {//D-Pad Up (All the way up)
@@ -284,14 +282,13 @@ public class Robot extends VisualRobot {
 		}
 		*/
 		else {
-			/**
 			//Resets Rumble
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
-			*/
+
 			//This sets the elevators speed when neither x or y are pressed
 			//Value of 0.1 is used to keep the elevator in position and strap taught
-			elevator.set(0.1);
+			elevator.set(0.125);
 		}
 		
 		
@@ -350,11 +347,11 @@ public class Robot extends VisualRobot {
 		
 
 		//Outputs Values to DS
-		SmartDashboard.putString("DB/String 3", "Left:" + Double.toString(leftEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 4", "Right:" + Double.toString(rightEncoder.getDistance()));
-		//SmartDashboard.putString("DB/String 7", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
-		//SmartDashboard.putString("DB/String 5", "PhotoEye:" + Boolean.toString(photoEye.get()));
-		//SmartDashboard.putString("DB/String 6", "LimitElevator:" + Boolean.toString(limitElevatorBottom.get()));
+		SmartDashboard.putString("DB/String 2", "Left:" + Double.toString(leftEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 3", "Right:" + Double.toString(rightEncoder.getDistance()));
+		//SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
+		SmartDashboard.putString("DB/String 5", "LimitElevator:" + Boolean.toString(!limitElevatorBottom.get()));
+		//SmartDashboard.putString("DB/String 6", "PhotoEye:" + Boolean.toString(photoEye.get()));
 	}
 }
 
