@@ -2,9 +2,6 @@
 
 package org.usfirst.frc.team834.robot;
 
-import visualrobot.ChooseAuton;
-import visualrobot.VisualRobot;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -17,6 +14,8 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import visualrobot.ChooseAuton;
+import visualrobot.VisualRobot;
 
 
 public class Robot extends VisualRobot {
@@ -46,7 +45,8 @@ public class Robot extends VisualRobot {
 	//Encoder elevatorEncoder;
 	ADXRS450_Gyro gyro;
 	DigitalInput limitElevatorBottom;
-	//DigitalInput photoEye;
+	DigitalInput limitElevatorTop;
+	//DigitalInput photoEye
 	//Encoders, Gyro, and Limit Switches Created
 	
 		
@@ -84,6 +84,7 @@ public class Robot extends VisualRobot {
 		//elevatorEncoder = new Encoder(4, 5);
 		gyro = new ADXRS450_Gyro();
 		limitElevatorBottom = new DigitalInput(6);
+		limitElevatorTop = new DigitalInput(7);
 		//photoEye = new DigitalInput(7);
 		//Encoders, Gyro, and Limit Switches Initialized
 		
@@ -101,8 +102,9 @@ public class Robot extends VisualRobot {
 		//super.sensors.put("elevatorEncoder", elevatorEncoder);
 		super.sensors.put("gyro", gyro);
 		super.sensors.put("limitElevatorBottom", limitElevatorBottom);
+		super.sensors.put("limitElevatorTop", limitElevatorTop);
 		super.motors.put("elevator", elevator);
-		super.motors.put("intakeWheels", intakeWheels);
+		super.motors.put("intake", intakeWheels);
 		super.motors.put("intakeGrab", intakeGrab);
 		//Super Sensors and Motors for BuildAnAuton
 		
@@ -130,7 +132,6 @@ public class Robot extends VisualRobot {
 		//Sensor Reset
 		leftEncoder.reset(); 
 		rightEncoder.reset();
-		//elevatorEncoder.reset();
 		//Sensors Reset
 		
 		
@@ -213,8 +214,9 @@ public class Robot extends VisualRobot {
 	
 	@Override
 	public void teleOpInit() {
-		
-		//There is nothing that must happen during teleOp Initialization
+		leftEncoder.reset();
+		rightEncoder.reset();
+		//There is nothing that must happen during teleOp initialization other than this.
 		
 	}
 	
@@ -247,18 +249,20 @@ public class Robot extends VisualRobot {
 			elevator.set(1.0);
 		}
 		else if (xbox.getRawButton(3)) { //X button (Down)
-			// Implement Limit Switch 
+			
+			
 			//The if statement below checks to see if the elevator is at it's minimum
 			if (!limitElevatorBottom.get()) { //If Pressed
-				//Sets the elevator to keep position when the limit switch is pressed
-				elevator.set(0.1);	
-				//Run Rumble
-				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);
+				
+				//Elevator stops moving
+				elevator.set(0);
+				
 			}
 			else { //If Not Pressed
-				//Sets the elevator to go down
+				
+				//Elevator goes down
 				elevator.set(-1.0);
+				
 			}
 		} 
 		/**
@@ -287,7 +291,7 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 
 			//This sets the elevators speed when neither x or y are pressed
-			//Value of 0.1 is used to keep the elevator in position and strap taught
+			//Value of 0.1 is used to keep the elevator in position and strap taught - 1.25 has the same effect.
 			elevator.set(0.125);
 		}
 		
