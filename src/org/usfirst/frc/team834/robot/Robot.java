@@ -307,7 +307,7 @@ public class Robot extends VisualRobot {
 		}
 		else {
 			//When neither trigger is pressed, the wheels for the intake are kept running to secure the cube.
-			intakeWheels.set(0.1);
+			//intakeWheels.set(0.1);
 		}
 		
 		
