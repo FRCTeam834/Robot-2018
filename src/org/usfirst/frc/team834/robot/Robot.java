@@ -2,6 +2,9 @@
 
 package org.usfirst.frc.team834.robot;
 
+import visualrobot.ChooseAuton;
+import visualrobot.VisualRobot;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -10,12 +13,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import visualrobot.ChooseAuton;
-import visualrobot.VisualRobot;
 
 
 public class Robot extends VisualRobot {
@@ -36,17 +38,17 @@ public class Robot extends VisualRobot {
 	SpeedController climber;
 	WPI_VictorSPX intakeWheels;
 	WPI_VictorSPX intakeGrab;
+	Spark sparkLeds;
 	//Speed Controllers and Intakes Created
 	
 	
 	//Encoders, Gyro, and Limit Switches Created
 	Encoder leftEncoder;
 	Encoder rightEncoder;
-	//Encoder elevatorEncoder;
+	Encoder elevatorEncoder;
 	ADXRS450_Gyro gyro;
-	DigitalInput limitElevatorBottom;
-	DigitalInput limitElevatorTop;
-	DigitalInput photoEye;
+	DigitalInput limitElevatorTop; // Photoeye
+	DigitalInput limitElevatorBottom; // Limit Switch
 	//Encoders, Gyro, and Limit Switches Created
 	
 		
@@ -69,10 +71,11 @@ public class Robot extends VisualRobot {
 		climber = new WPI_VictorSPX(8);
 		intakeWheels = new WPI_VictorSPX(9);
 		intakeGrab = new WPI_VictorSPX(10);
+		sparkLeds = new Spark(9);
 		//Drive Trains, Speed Controllers, and More Motors Initialized
 		
 		
-		//Invert Motors To Make Logical
+		//Invert Motors To Make Logical (1.0 Up, -1.0 Down)
 		elevator.setInverted(true);
 		climber.setInverted(true);
 		//Invert Motors To Make Logical
@@ -81,10 +84,10 @@ public class Robot extends VisualRobot {
 		//Encoders, Gyro, and Limit Switches Initialized
 		leftEncoder = new Encoder(0, 1);
 		rightEncoder = new Encoder(2, 3);
-		//elevatorEncoder = new Encoder(4, 5);
+		elevatorEncoder = new Encoder(4, 5);
 		gyro = new ADXRS450_Gyro();
+		limitElevatorTop = new DigitalInput(6);
 		limitElevatorBottom = new DigitalInput(7);
-		photoEye = new DigitalInput(6);
 		//Encoders, Gyro, and Limit Switches Initialized
 		
 		
@@ -98,12 +101,12 @@ public class Robot extends VisualRobot {
 		//Super Sensors and Motors for BuildAnAuton
 		super.sensors.put("leftEncoder", leftEncoder);
 		super.sensors.put("rightEncoder", rightEncoder);
-		//super.sensors.put("elevatorEncoder", elevatorEncoder);
+		super.sensors.put("elevatorEncoder", elevatorEncoder);
 		super.sensors.put("gyro", gyro);
+		super.sensors.put("limitElevatorTop", limitElevatorTop);		
 		super.sensors.put("limitElevatorBottom", limitElevatorBottom);
-		super.sensors.put("limitElevatorTop", limitElevatorTop);
 		super.motors.put("elevator", elevator);
-		super.motors.put("intake", intakeWheels);
+		super.motors.put("intakeWheels", intakeWheels);
 		super.motors.put("intakeGrab", intakeGrab);
 		//Super Sensors and Motors for BuildAnAuton
 		
@@ -114,9 +117,10 @@ public class Robot extends VisualRobot {
 		
 		
 		//Sensors Calibrated and Reset
-		gyro.calibrate();
 		leftEncoder.reset();
 		rightEncoder.reset();
+		elevatorEncoder.reset();
+		gyro.calibrate();
 		//Sensors Calibrated and Reset
 	}
 	
@@ -131,6 +135,7 @@ public class Robot extends VisualRobot {
 		//Sensor Reset
 		leftEncoder.reset(); 
 		rightEncoder.reset();
+		elevatorEncoder.reset();
 		//Sensors Reset
 		
 		
@@ -176,7 +181,11 @@ public class Robot extends VisualRobot {
 				auton = robotLocation;
 			}
 			
-			//Tells BuildAnAuton to play the correct auton	
+			if(auton.equalsIgnoreCase("LeftSwitchR") || auton.equalsIgnoreCase("RightSwitchL")) {
+				auton = "BaseLine";
+			}
+			
+			//Tells BuildAnAuton to play the correct auton
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 			c.run();
 		}
@@ -213,9 +222,8 @@ public class Robot extends VisualRobot {
 	
 	@Override
 	public void teleOpInit() {
-		leftEncoder.reset();
-		rightEncoder.reset();
-		//There is nothing that must happen during teleOp initialization other than this.
+		
+		//There is nothing that must happen during teleOp Initialization
 		
 	}
 	
@@ -233,9 +241,9 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawButton(4)) { //Y button (Up)
 			// Implement Photoelectric Sensor
 			//The if statement below checks to see if the elevator is at it's max
-			if (photoEye.get()) { //Black Visible
+			if (limitElevatorTop.get()) { //Black Visible
 				//Sets the elevator to keep position when the Black Dot is Visible
-				elevator.set(0.1);	
+				elevator.set(0.125);	
 				//Run Rumble
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
@@ -243,55 +251,60 @@ public class Robot extends VisualRobot {
 			else { //Black Not Visible
 				//Sets the elevator to go up
 				elevator.set(1.0);
-			}
-			
-			//elevator.set(1.0);
+			}			
 		}
 		else if (xbox.getRawButton(3)) { //X button (Down)
-			
-			
+			// Implement Limit Switch 
 			//The if statement below checks to see if the elevator is at it's minimum
 			if (!limitElevatorBottom.get()) { //If Pressed
-				
-				//Elevator stops moving
-				elevator.set(0);
-				
+				//Sets the elevator to keep position when the limit switch is pressed
+				elevator.set(0.125);	
+				//Run Rumble
+				xbox.setRumble(RumbleType.kLeftRumble, 1);
+				xbox.setRumble(RumbleType.kRightRumble, 1);
+				//Reset Elevator Encoder
+				elevatorEncoder.reset();
 			}
 			else { //If Not Pressed
-				
-				//Elevator goes down
+				//Sets the elevator to go down
 				elevator.set(-1.0);
-				
 			}
 		} 
-		/**
-		else if (xbox.getRawButton(100)) {//D-Pad Up (All the way up)
-			while (		) { //Black Not Visible
+		
+		/*
+		// Makes use of the D-Pad to automatically go to set heights
+		else if (xbox.getPOV() == 0) {//D-Pad Up (All the way up)
+			while (limitElevatorTop.get()) { //Black Not Visible
 				elevator.set(1.0);
 			}
 		}
-		else if (xbox.getRawButton(100)) {//D-Pad Down (All the way down)
-			while (		) { //Limit Not Pressed
+		else if (xbox.getPOV() == 180) {//D-Pad Down (All the way down)
+			while (!limitElevatorBottom.get()) { //Limit Not Pressed
 				elevator.set(-1.0);
 			}
 		}
-		else if (xbox.getRawButton(100)) {//D-Pad Right (Switch Height)
-			while (elevatorEncoder.getRaw() < 5000) { //Going Up To Height
-				elevator.set(1.0);
+		else if (xbox.getPOV() == 90) {//D-Pad Right (Switch Height)
+			if (elevatorEncoder.getRaw() < 5000) {
+				while (elevatorEncoder.getRaw() < 5000) { //Going Up To Height
+					elevator.set(1.0);
+				}
 			}
-			while (elevatorEncoder.getRaw() > 5000) { //Going Down To Height
-				elevator.set(-1.0);
+			else {
+				while (elevatorEncoder.getRaw() > 5000) { //Going Down To Height
+					elevator.set(-1.0);
+				}
 			}
 		}
 		*/
+		
 		else {
 			//Resets Rumble
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 
 			//This sets the elevators speed when neither x or y are pressed
-			//Value of 0.1 is used to keep the elevator in position and strap taught - 1.25 has the same effect.
-			elevator.set(0.125);
+			//Value of 0.1 is used to keep the elevator in position and strap taught
+			elevator.set(0.15);
 		}
 		
 		
@@ -305,57 +318,57 @@ public class Robot extends VisualRobot {
 			intakeWheels.set(-1.0);
 		}
 		else {
-			//When neither trigger is pressed, the wheels for the intake are STOPPED SO WE DON'T RUN INTO ERRORS
+			//When neither trigger is pressed, the wheels for the intake are kept running to secure the cube.
 			intakeWheels.set(0);
 		}
 		
 		
 		//This is to open or close the intake
-		if (xbox.getRawButton(5)) { //This is the Left Bumper (Open)
-			/**	
-			if (!limitIntake.get()) {
-				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);				
-			}
-			*/
+		if (xbox.getRawButton(6)) { //This is the Left Bumper (Open)
 			intakeGrab.set(1.0);	
 		}
-		else if (xbox.getRawButton(6)) {//Right Shoulder (Close)
-			/**
-			if (!limitIntake.get()) {
-				xbox.setRumble(RumbleType.kLeftRumble, 1);
-				xbox.setRumble(RumbleType.kRightRumble, 1);
-			}
-			 */
+		else if (xbox.getRawButton(5)) {//Right Shoulder (Close)
 			intakeGrab.set(-1.0);
 		}
 		else {
-			/**
-			//Resets rumble if nothing is pressed
-			xbox.setRumble(RumbleType.kLeftRumble, 0);
-			xbox.setRumble(RumbleType.kRightRumble, 0);
-			*/
 			//When neither bumper is pressed, the grabber for the intake is turned off.
 			intakeGrab.set(0);
 		}
 		
 		
 		//Buttons that make your robot climb up
-		if(xbox.getRawButton(2)){ //B (Climb Up)
+		if (xbox.getRawButton(2)){ //B (Climb Up)
 			climber.set(1.0);
+		}
+		else if (xbox.getRawButton(1)) { //A (Climb Down)
+			climber.set(-1.0);
 		}
 		else {
 			climber.set(0);
 		}
 		
+		
+		//Left D-PAD refreshes led setting to value specified in DS String 9
+		if (xbox.getPOV() == 270){ //B (Climb Up)
+			String ledValueString = SmartDashboard.getString("DB/String 9", "0.65"); //Input is "Switch" or "Scale"
+			Double ledValueDouble = Double.parseDouble(ledValueString);
+			sparkLeds.set(ledValueDouble);
+		}
 
+		
 		//Outputs Values to DS
-		SmartDashboard.putString("DB/String 2", "Left: " + Double.toString(leftEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 3", "Right: " + Double.toString(rightEncoder.getDistance()));
-		//SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
-		SmartDashboard.putString("DB/String 5", "LimitElevatorBottom: " + Boolean.toString(!limitElevatorBottom.get()));
-		SmartDashboard.putString("DB/String 6", "PhotoEye: " + Boolean.toString(photoEye.get()));
+		SmartDashboard.putString("DB/String 2", "Left:" + Double.toString(leftEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 3", "Right:" + Double.toString(rightEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
+		SmartDashboard.putString("DB/String 6", "LimitElevatorTop:" + Boolean.toString(limitElevatorTop.get()));
+		SmartDashboard.putString("DB/String 5", "LimitElevatorBottom:" + Boolean.toString(!limitElevatorBottom.get()));
 	}
 }
 
-//Please stop changing stuff in the robot code guys, it's creating more problems than fixing them.'
+
+/*			
+ * Krishna and Dom have some fun plans for the future :D
+ * xbox.setRumble(RumbleType.kLeftRumble, 1);
+ * xbox.setRumble(RumbleType.kRightRumble, 1);
+ */
+
