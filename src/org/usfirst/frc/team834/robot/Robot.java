@@ -46,7 +46,7 @@ public class Robot extends VisualRobot {
 	ADXRS450_Gyro gyro;
 	DigitalInput limitElevatorBottom;
 	DigitalInput limitElevatorTop;
-	//DigitalInput photoEye
+	DigitalInput photoEye;
 	//Encoders, Gyro, and Limit Switches Created
 	
 		
@@ -83,9 +83,8 @@ public class Robot extends VisualRobot {
 		rightEncoder = new Encoder(2, 3);
 		//elevatorEncoder = new Encoder(4, 5);
 		gyro = new ADXRS450_Gyro();
-		limitElevatorBottom = new DigitalInput(6);
-		limitElevatorTop = new DigitalInput(7);
-		//photoEye = new DigitalInput(7);
+		limitElevatorBottom = new DigitalInput(7);
+		photoEye = new DigitalInput(6);
 		//Encoders, Gyro, and Limit Switches Initialized
 		
 		
@@ -232,9 +231,9 @@ public class Robot extends VisualRobot {
 		
 		//The xbox controller's X and Y buttons control the elevator
 		if (xbox.getRawButton(4)) { //Y button (Up)
-			/** Implement Photoelectric Sensor
+			// Implement Photoelectric Sensor
 			//The if statement below checks to see if the elevator is at it's max
-			if (	) { //Black Visible
+			if (photoEye.get()) { //Black Visible
 				//Sets the elevator to keep position when the Black Dot is Visible
 				elevator.set(0.1);	
 				//Run Rumble
@@ -245,8 +244,8 @@ public class Robot extends VisualRobot {
 				//Sets the elevator to go up
 				elevator.set(1.0);
 			}
-			*/
-			elevator.set(1.0);
+			
+			//elevator.set(1.0);
 		}
 		else if (xbox.getRawButton(3)) { //X button (Down)
 			
@@ -306,8 +305,8 @@ public class Robot extends VisualRobot {
 			intakeWheels.set(-1.0);
 		}
 		else {
-			//When neither trigger is pressed, the wheels for the intake are kept running to secure the cube.
-			//intakeWheels.set(0.1);
+			//When neither trigger is pressed, the wheels for the intake are STOPPED SO WE DON'T RUN INTO ERRORS
+			intakeWheels.set(0);
 		}
 		
 		
@@ -351,18 +350,12 @@ public class Robot extends VisualRobot {
 		
 
 		//Outputs Values to DS
-		SmartDashboard.putString("DB/String 2", "Left:" + Double.toString(leftEncoder.getDistance()));
-		SmartDashboard.putString("DB/String 3", "Right:" + Double.toString(rightEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 2", "Left: " + Double.toString(leftEncoder.getDistance()));
+		SmartDashboard.putString("DB/String 3", "Right: " + Double.toString(rightEncoder.getDistance()));
 		//SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
-		SmartDashboard.putString("DB/String 5", "LimitElevator:" + Boolean.toString(!limitElevatorBottom.get()));
-		//SmartDashboard.putString("DB/String 6", "PhotoEye:" + Boolean.toString(photoEye.get()));
+		SmartDashboard.putString("DB/String 5", "LimitElevatorBottom: " + Boolean.toString(!limitElevatorBottom.get()));
+		SmartDashboard.putString("DB/String 6", "PhotoEye: " + Boolean.toString(photoEye.get()));
 	}
 }
 
-
-/*			
- * Krishna and Dom have some fun plans for the future :D
- * xbox.setRumble(RumbleType.kLeftRumble, 1);
- * xbox.setRumble(RumbleType.kRightRumble, 1);
- */
-
+//Please stop changing stuff in the robot code guys, it's creating more problems than fixing them.'
