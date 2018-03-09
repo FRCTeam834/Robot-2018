@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends VisualRobot {
 
+	//Class Variables
+	Double ledValueDouble;
+	//Class Variables
 	
 	//Joysticks and DriveTrain Created
 	DifferentialDrive driveTrain;
@@ -54,7 +57,6 @@ public class Robot extends VisualRobot {
 		
 	@Override
 	public void robotInit() {
-		
 		
 		//Joysticks Initialized
 		leftStick = new Joystick(0);
@@ -128,9 +130,7 @@ public class Robot extends VisualRobot {
 	@Override
 	public void autonomous() { 
 		
-		
 		//Everything below runs and chooses an auton
-		
 		
 		//Sensor Reset
 		leftEncoder.reset(); 
@@ -181,6 +181,7 @@ public class Robot extends VisualRobot {
 				auton = robotLocation;
 			}
 			
+			//Runs BaseLine auton if requested impossible
 			if(auton.equalsIgnoreCase("LeftSwitchR") || auton.equalsIgnoreCase("RightSwitchL")) {
 				auton = "BaseLine";
 			}
@@ -190,13 +191,12 @@ public class Robot extends VisualRobot {
 			c.run();
 		}
 		catch(Exception e) {
+			//Doesn't Work, but could prevent a crash 
 			System.out.println(e.getMessage());
 			System.out.println("Auton Error in Try Statement, Running Base Line Auton");
 			c.chooseAuton("BaseLine"); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 			c.run();
 		}
-		
-		
 		//Done choosing an auton and running it
 	}
 	
@@ -225,12 +225,16 @@ public class Robot extends VisualRobot {
 		
 		//There is nothing that must happen during teleOp Initialization
 		
+		//Refreshes led setting to value specified in DS String 9
+				String ledValueString = SmartDashboard.getString("DB/String 9", "0.53");
+				ledValueDouble = Double.parseDouble(ledValueString);
 	}
 	
 
 	@Override
 	public void teleOpPeriodic() {
 
+		sparkLeds.set(ledValueDouble);
 		
 		//Allows the joysticks to control the robot driving
 		//This should be used used instead of independently setting the right and left side
@@ -243,7 +247,7 @@ public class Robot extends VisualRobot {
 			//The if statement below checks to see if the elevator is at it's max
 			if (limitElevatorTop.get()) { //Black Visible
 				//Sets the elevator to keep position when the Black Dot is Visible
-				elevator.set(0.125);	
+				elevator.set(0.15);	
 				//Run Rumble
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
@@ -258,7 +262,7 @@ public class Robot extends VisualRobot {
 			//The if statement below checks to see if the elevator is at it's minimum
 			if (!limitElevatorBottom.get()) { //If Pressed
 				//Sets the elevator to keep position when the limit switch is pressed
-				elevator.set(0.125);	
+				elevator.set(0.15);	
 				//Run Rumble
 				xbox.setRumble(RumbleType.kLeftRumble, 1);
 				xbox.setRumble(RumbleType.kRightRumble, 1);
@@ -270,33 +274,6 @@ public class Robot extends VisualRobot {
 				elevator.set(-1.0);
 			}
 		} 
-		
-		/*
-		// Makes use of the D-Pad to automatically go to set heights
-		else if (xbox.getPOV() == 0) {//D-Pad Up (All the way up)
-			while (limitElevatorTop.get()) { //Black Not Visible
-				elevator.set(1.0);
-			}
-		}
-		else if (xbox.getPOV() == 180) {//D-Pad Down (All the way down)
-			while (!limitElevatorBottom.get()) { //Limit Not Pressed
-				elevator.set(-1.0);
-			}
-		}
-		else if (xbox.getPOV() == 90) {//D-Pad Right (Switch Height)
-			if (elevatorEncoder.getRaw() < 5000) {
-				while (elevatorEncoder.getRaw() < 5000) { //Going Up To Height
-					elevator.set(1.0);
-				}
-			}
-			else {
-				while (elevatorEncoder.getRaw() > 5000) { //Going Down To Height
-					elevator.set(-1.0);
-				}
-			}
-		}
-		*/
-		
 		else {
 			//Resets Rumble
 			xbox.setRumble(RumbleType.kLeftRumble, 0);
@@ -347,28 +324,13 @@ public class Robot extends VisualRobot {
 			climber.set(0);
 		}
 		
-		
-		//Left D-PAD refreshes led setting to value specified in DS String 9
-		if (xbox.getPOV() == 270){ //B (Climb Up)
-			String ledValueString = SmartDashboard.getString("DB/String 9", "0.65"); //Input is "Switch" or "Scale"
-			Double ledValueDouble = Double.parseDouble(ledValueString);
-			sparkLeds.set(ledValueDouble);
-		}
-
-		
+			
 		//Outputs Values to DS
 		SmartDashboard.putString("DB/String 2", "Left:" + Double.toString(leftEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 3", "Right:" + Double.toString(rightEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
-		SmartDashboard.putString("DB/String 6", "LimitElevatorTop:" + Boolean.toString(limitElevatorTop.get()));
-		SmartDashboard.putString("DB/String 5", "LimitElevatorBottom:" + Boolean.toString(!limitElevatorBottom.get()));
+		SmartDashboard.putString("DB/String 5", "LimitElevatorTop:" + Boolean.toString(limitElevatorTop.get()));
+		SmartDashboard.putString("DB/String 6", "LimitElevatorBottom:" + Boolean.toString(!limitElevatorBottom.get()));
 	}
 }
-
-
-/*			
- * Krishna and Dom have some fun plans for the future :D
- * xbox.setRumble(RumbleType.kLeftRumble, 1);
- * xbox.setRumble(RumbleType.kRightRumble, 1);
- */
 
