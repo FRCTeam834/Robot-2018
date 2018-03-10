@@ -156,27 +156,34 @@ public class Robot extends VisualRobot {
 			//This is the auton file name that will run
 			String auton = "";
 			
-			//This makes sure the correct auton will be selected regardless of inputed letter case
-			if(robotLocation.equalsIgnoreCase("left")) {
+			//Locale for string capitalization
+			Locale loc = Locale.ENGLISH;
+			
+			//Selects the correct starting robotLocation
+			if(robotLocation.toUpperCase(loc).contains("LEFT") || robotLocation.contains("L") ||
+			   robotLocation.contains("1")) {
 				robotLocation = "Left";
 			}
-			else if(robotLocation.equalsIgnoreCase("right")) {
-				robotLocation = "Right";
-			}
-			else if(robotLocation.equalsIgnoreCase("center")) {
+			else if(robotLocation.toUpperCase(loc).contains("CENTER") || robotLocation.contains("C") ||
+					robotLocation.toUpperCase(loc).contains("MIDDLE") || robotLocation.contains("M") ||
+					robotLocation.contains("2")) {
 				robotLocation = "Center";
+			}
+			else if(robotLocation.toUpperCase(loc).contains("RIGHT") || robotLocation.contains("R") ||
+					robotLocation.contains("3")) {
+				robotLocation = "Right";
 			}
 			
 			//Selects the current plateLocation for the selected goal
-			if(goal.equalsIgnoreCase("switch")){
+			if(goal.toUpperCase(loc).contains("SW") || goal.contains("1")) {
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Switch" + gameData.charAt(0);
 			}
-			else if(goal.equalsIgnoreCase("scale")) {				
+			else if(goal.toUpperCase(loc).contains("SC") || goal.contains("2")) {				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Scale" + gameData.charAt(1);
 			}
-			else {				
+			else {
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation;
 			}
@@ -276,7 +283,7 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 
 			//This sets the elevators speed when neither x or y are pressed
-			//Value of 0.1 is used to keep the elevator in position and strap taught
+			//Value of 0.15 is used to keep the elevator in position and strap taught
 			elevator.set(0.15);
 		}
 		
