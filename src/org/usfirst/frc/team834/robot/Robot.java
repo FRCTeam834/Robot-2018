@@ -225,16 +225,12 @@ public class Robot extends VisualRobot {
 		
 		//There is nothing that must happen during teleOp Initialization
 		
-		//Refreshes led setting to value specified in DS String 9
-				String ledValueString = SmartDashboard.getString("DB/String 9", "0.53");
-				ledValueDouble = Double.parseDouble(ledValueString);
 	}
 	
 
 	@Override
 	public void teleOpPeriodic() {
 
-		sparkLeds.set(ledValueDouble);
 		
 		//Allows the joysticks to control the robot driving
 		//This should be used used instead of independently setting the right and left side
@@ -271,7 +267,7 @@ public class Robot extends VisualRobot {
 			}
 			else { //If Not Pressed
 				//Sets the elevator to go down
-				elevator.set(-1.0);
+				elevator.set(-0.25);
 			}
 		} 
 		else {
