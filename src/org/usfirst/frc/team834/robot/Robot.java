@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -21,10 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Robot extends VisualRobot {
-
-	//Class Variables
-	Double ledValueDouble;
-	//Class Variables
 	
 	//Joysticks and DriveTrain Created
 	DifferentialDrive driveTrain;
@@ -41,7 +36,6 @@ public class Robot extends VisualRobot {
 	SpeedController climber;
 	WPI_VictorSPX intakeWheels;
 	WPI_VictorSPX intakeGrab;
-	Spark sparkLeds;
 	//Speed Controllers and Intakes Created
 	
 	
@@ -73,7 +67,6 @@ public class Robot extends VisualRobot {
 		climber = new WPI_VictorSPX(8);
 		intakeWheels = new WPI_VictorSPX(9);
 		intakeGrab = new WPI_VictorSPX(10);
-		sparkLeds = new Spark(9);
 		//Drive Trains, Speed Controllers, and More Motors Initialized
 		
 		
@@ -146,56 +139,69 @@ public class Robot extends VisualRobot {
 		
 		//Chooses an auton based on the input on the smart dashboard and game data
 		try {
+			
 			//Gets strings from SmartDashboard
 			String robotLocation = SmartDashboard.getString("DB/String 0", ""); //Input is "Center", "Right", or "Left"
 			String goal = SmartDashboard.getString("DB/String 1", ""); //Input is "Switch" or "Scale"
 				
 			//Gets plate location from DS
 			String gameData = DriverStation.getInstance().getGameSpecificMessage(); //Gets 3 char string of plate locations
-				
+
 			//This is the auton file name that will run
-			String auton = "";
+			String auton = "BaseLine";
 			
-			//Locale for string capitalization
-			Locale loc = Locale.ENGLISH;
-			
-			//Selects the correct starting robotLocation
-			if(robotLocation.toUpperCase(loc).contains("LEFT") || robotLocation.contains("L") ||
-			   robotLocation.contains("1")) {
+			//This makes sure the correct auton will be selected regardless of inputed letter case
+			if(robotLocation.equalsIgnoreCase("left")) {
 				robotLocation = "Left";
 			}
-			else if(robotLocation.toUpperCase(loc).contains("CENTER") || robotLocation.contains("C") ||
-					robotLocation.toUpperCase(loc).contains("MIDDLE") || robotLocation.contains("M") ||
-					robotLocation.contains("2")) {
-				robotLocation = "Center";
-			}
-			else if(robotLocation.toUpperCase(loc).contains("RIGHT") || robotLocation.contains("R") ||
-					robotLocation.contains("3")) {
+			else if(robotLocation.equalsIgnoreCase("right")) {
 				robotLocation = "Right";
 			}
-			
+			else if(robotLocation.equalsIgnoreCase("center")) {
+				robotLocation = "Center";
+			}
+			//Runs a specified auton, DS 0 == "BYPASS", DS 1 == "Specified Auton"
+			else if(robotLocation.equalsIgnoreCase("bypass")){
+				auton = goal;
+			}
+
 			//Selects the current plateLocation for the selected goal
-			if(goal.toUpperCase(loc).contains("SW") || goal.contains("1")) {
+			if(goal.equalsIgnoreCase("switch")){
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Switch" + gameData.charAt(0);
 			}
-			else if(goal.toUpperCase(loc).contains("SC") || goal.contains("2")) {				
+			else if(goal.equalsIgnoreCase("scale")) {				
 				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
 				auton = robotLocation + "Scale" + gameData.charAt(1);
 			}
-			else {
-				//Chooses auton based on location of robot, what priority for that round is, and which side the colors on
-				auton = robotLocation;
+			//If the priority set is run, but not favorable, lets see if we can do the other goal straight ahead
+			else if(goal.equalsIgnoreCase("switchp")) {
+				if(robotLocation.charAt(0) == gameData.charAt(0)) {
+					auton = robotLocation + "Switch" + gameData.charAt(0);
+				}
+				else if(robotLocation.charAt(0) == gameData.charAt(1)) {
+					auton = robotLocation + "Scale" + gameData.charAt(1);
+				}
+			}
+			else if(goal.equalsIgnoreCase("scalep")) {
+				if(robotLocation.charAt(0) == gameData.charAt(1)) {
+					auton = robotLocation + "Scale" + gameData.charAt(1);
+				}
+				else if(robotLocation.charAt(0) == gameData.charAt(0)) {
+					auton = robotLocation + "Switch" + gameData.charAt(0);
+				}
 			}
 			
 			//Runs BaseLine auton if requested impossible
 			if(auton.equalsIgnoreCase("LeftSwitchR") || auton.equalsIgnoreCase("RightSwitchL")) {
 				auton = "BaseLine";
 			}
+
+			System.out.println(auton);
 			
 			//Tells BuildAnAuton to play the correct auton
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
-			c.run();
+			c.run();				
 		}
 		catch(Exception e) {
 			//Doesn't Work, but could prevent a crash 
@@ -238,7 +244,6 @@ public class Robot extends VisualRobot {
 	@Override
 	public void teleOpPeriodic() {
 
-		
 		//Allows the joysticks to control the robot driving
 		//This should be used used instead of independently setting the right and left side
 		driveTrain.tankDrive(-leftStick.getY(), -rightStick.getY());
@@ -283,7 +288,7 @@ public class Robot extends VisualRobot {
 			xbox.setRumble(RumbleType.kRightRumble, 0);
 
 			//This sets the elevators speed when neither x or y are pressed
-			//Value of 0.15 is used to keep the elevator in position and strap taught
+			//Value of 0.1 is used to keep the elevator in position and strap taught
 			elevator.set(0.15);
 		}
 		
