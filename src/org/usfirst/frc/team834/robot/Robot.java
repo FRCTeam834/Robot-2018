@@ -2,9 +2,6 @@
 
 package org.usfirst.frc.team834.robot;
 
-import visualrobot.ChooseAuton;
-import visualrobot.VisualRobot;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -13,10 +10,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import visualrobot.ChooseAuton;
+import visualrobot.VisualRobot;
 
 
 public class Robot extends VisualRobot {
@@ -46,6 +46,7 @@ public class Robot extends VisualRobot {
 	ADXRS450_Gyro gyro;
 	DigitalInput limitElevatorTop; // Photoeye
 	DigitalInput limitElevatorBottom; // Limit Switch
+	Spark led;
 	//Encoders, Gyro, and Limit Switches Created
 	
 		
@@ -116,6 +117,7 @@ public class Robot extends VisualRobot {
 		rightEncoder.reset();
 		elevatorEncoder.reset();
 		gyro.calibrate();
+		led = new Spark(9);
 		//Sensors Calibrated and Reset
 	}
 	
@@ -243,7 +245,7 @@ public class Robot extends VisualRobot {
 
 	@Override
 	public void teleOpPeriodic() {
-
+		led.set(.53);
 		//Allows the joysticks to control the robot driving
 		//This should be used used instead of independently setting the right and left side
 		driveTrain.tankDrive(-leftStick.getY(), -rightStick.getY());
@@ -253,6 +255,7 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawButton(4)) { //Y button (Up)
 			// Implement Photoelectric Sensor
 			//The if statement below checks to see if the elevator is at it's max
+			led.set(-.39);
 			if (limitElevatorTop.get()) { //Black Visible
 				//Sets the elevator to keep position when the Black Dot is Visible
 				elevator.set(0.15);	
@@ -263,11 +266,13 @@ public class Robot extends VisualRobot {
 			else { //Black Not Visible
 				//Sets the elevator to go up
 				elevator.set(1.0);
+				
 			}			
 		}
 		else if (xbox.getRawButton(3)) { //X button (Down)
 			// Implement Limit Switch 
 			//The if statement below checks to see if the elevator is at it's minimum
+			led.set(-.41);
 			if (!limitElevatorBottom.get()) { //If Pressed
 				//Sets the elevator to keep position when the limit switch is pressed
 				elevator.set(0.15);	
@@ -297,10 +302,12 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawAxis(2) >= 0.75) { //This is the Left Trigger
 			//When the left trigger is pressed, the wheels spin inward, allowing the robot to swallow some cubes
 			intakeWheels.set(1.0);
+			led.set(-.71);
 		}
 		else if (xbox.getRawAxis(3) >= 0.75) { //This is the right trigger
 			//When the right trigger is pressed, the wheels spin outward, allowing the robot to spit out the cubes
 			intakeWheels.set(-1.0);
+			led.set(-.71);
 		}
 		else {
 			//When neither trigger is pressed, the wheels for the intake are kept running to secure the cube.
@@ -310,10 +317,12 @@ public class Robot extends VisualRobot {
 		
 		//This is to open or close the intake
 		if (xbox.getRawButton(6)) { //This is the Left Bumper (Open)
-			intakeGrab.set(1.0);	
+			intakeGrab.set(1.0);
+			led.set(.85);
 		}
 		else if (xbox.getRawButton(5)) {//Right Shoulder (Close)
 			intakeGrab.set(-1.0);
+			led.set(.85);
 		}
 		else {
 			//When neither bumper is pressed, the grabber for the intake is turned off.
@@ -324,9 +333,11 @@ public class Robot extends VisualRobot {
 		//Buttons that make your robot climb up
 		if (xbox.getRawButton(2)){ //B (Climb Up)
 			climber.set(1.0);
+			led.set(-.45);
 		}
 		else if (xbox.getRawButton(1)) { //A (Climb Down)
 			climber.set(-1.0);
+			led.set(-.45);
 		}
 		else {
 			climber.set(0);
