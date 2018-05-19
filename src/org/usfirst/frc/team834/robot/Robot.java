@@ -21,9 +21,7 @@ import visualrobot.VisualRobot;
 
 
 public class Robot extends VisualRobot {
-	
-	int index = 0;
-	
+		
 	//Joysticks and DriveTrain Created
 	DifferentialDrive driveTrain;
 	Joystick leftStick;
@@ -49,6 +47,7 @@ public class Robot extends VisualRobot {
 	ADXRS450_Gyro gyro;
 	DigitalInput limitElevatorTop; // Photoeye
 	DigitalInput limitElevatorBottom; // Limit Switch
+	DigitalInput cubeSensor; // Proximity Sensor
 	Spark led;
 	//Encoders, Gyro, and Limit Switches Created
 	
@@ -75,7 +74,7 @@ public class Robot extends VisualRobot {
 		
 		
 		//Invert Motors To Make Logical (1.0 Up, -1.0 Down)
-		elevator.setInverted(true);
+		//elevator.setInverted(true);
 		climber.setInverted(true);
 		//Invert Motors To Make Logical
 		
@@ -87,6 +86,7 @@ public class Robot extends VisualRobot {
 		gyro = new ADXRS450_Gyro();
 		limitElevatorTop = new DigitalInput(6);
 		limitElevatorBottom = new DigitalInput(7);
+		cubeSensor = new DigitalInput(8);
 		led = new Spark(9);
 		//Encoders, Gyro, and Limit Switches Initialized
 		
@@ -137,10 +137,12 @@ public class Robot extends VisualRobot {
 		//Sensors Reset
 		
 		
+		
 		//Creates ChooseAuton Object
 		ChooseAuton c = new ChooseAuton(this);
 		//Creates ChooseAuton Object
-
+		
+		
 		
 		//Chooses an auton based on the input on the smart dashboard and game data
 		try {
@@ -187,6 +189,9 @@ public class Robot extends VisualRobot {
 				else if(robotLocation.charAt(0) == gameData.charAt(1)) {
 					auton = robotLocation + "Scale" + gameData.charAt(1);
 				}
+				else {
+					auton = robotLocation + "Scale" + gameData.charAt(1);
+				}
 			}
 			else if(goal.equalsIgnoreCase("scalep")) {
 				if(robotLocation.charAt(0) == gameData.charAt(1)) {
@@ -195,17 +200,25 @@ public class Robot extends VisualRobot {
 				else if(robotLocation.charAt(0) == gameData.charAt(0)) {
 					auton = robotLocation + "Switch" + gameData.charAt(0);
 				}
+				else {
+					auton = robotLocation + "Scale" + gameData.charAt(1);
+				}
 			}
 			
+			
+		
 			//Runs BaseLine auton if requested impossible
-			if(auton.equalsIgnoreCase("LeftSwitchR") || auton.equalsIgnoreCase("RightSwitchL") || auton.equalsIgnoreCase("LeftScaleR") || auton.equalsIgnoreCase("RightScaleL")) {
+			//*****|| auton.equalsIgnoreCase("LeftScaleR") || auton.equalsIgnoreCase("RightScaleL")******
+			if(auton.equalsIgnoreCase("LeftSwitchR") || auton.equalsIgnoreCase("RightSwitchL")) {
 				auton = "BaseLine";
 			}
+			
 
 			System.out.println(robotLocation);
 			System.out.println(goal);
 			System.out.println(gameData);
 			System.out.println(auton);
+			
 			
 			//Tells BuildAnAuton to play the correct auton
 			c.chooseAuton(auton); //Chooses auton based on location of robot, what priority for that round is, and which side the colors on
@@ -262,7 +275,7 @@ public class Robot extends VisualRobot {
 			// Implement Photoelectric Sensor
 			//The if statement below checks to see if the elevator is at it's max
 			if (limitElevatorTop.get()) { //Black Visible
-				led.set(0.61);
+				led.set(-0.89);
 				//Sets the elevator to keep position when the Black Dot is Visible
 				elevator.set(0.15);	
 				//Run Rumble
@@ -279,7 +292,7 @@ public class Robot extends VisualRobot {
 			// Implement Limit Switch 
 			//The if statement below checks to see if the elevator is at it's minimum
 			if (!limitElevatorBottom.get()) { //If Pressed
-				led.set(0.61);
+				led.set(-0.89);
 				//Sets the elevator to keep position when the limit switch is pressed
 				elevator.set(0.15);	
 				//Run Rumble
@@ -309,10 +322,12 @@ public class Robot extends VisualRobot {
 		if (xbox.getRawAxis(2) >= 0.75) { //This is the Left Trigger
 			//When the left trigger is pressed, the wheels spin inward, allowing the robot to swallow some cubes
 			intakeWheels.set(1.0);
+			led.set(0.81);
 		}
 		else if (xbox.getRawAxis(3) >= 0.75) { //This is the right trigger
 			//When the right trigger is pressed, the wheels spin outward, allowing the robot to spit out the cubes
 			intakeWheels.set(-1.0);
+			led.set(0.89);
 		}
 		else {
 			//When neither trigger is pressed, the wheels for the intake are kept running to secure the cube.
@@ -322,9 +337,11 @@ public class Robot extends VisualRobot {
 		
 		//This is to open or close the intake
 		if (xbox.getRawButton(6)) { //This is the Left Bumper (Open)
+			led.set(0.89);
 			intakeGrab.set(1.0);	
 		}
 		else if (xbox.getRawButton(5)) {//Right Shoulder (Close)
+			led.set(0.81);
 			intakeGrab.set(-1.0);
 		}
 		else {
@@ -335,9 +352,8 @@ public class Robot extends VisualRobot {
 		
 		//Buttons that make your robot climb up
 		if (xbox.getRawButton(2)){ //B (Climb Up)
-			led.set(0.65);
+			led.set(0.63);
 			climber.set(1.0);
-			index = 834;
 		}
 		else if (xbox.getRawButton(8)) { //A (Climb Down)
 			led.set(-0.11);
@@ -348,12 +364,26 @@ public class Robot extends VisualRobot {
 		}
 		
 		
-		//Sets the leds to yellow when 30 seconds left in the game, GO CLIMB!
-		if(DriverStation.getInstance().getMatchTime() <= 30 && index != 30 && index != 834) {
-			index = 30;
+		//Is a cube in? Then turn the leds green!
+		if (!cubeSensor.get() && !limitElevatorBottom.get()) {
+			led.set(0.77); //Green
 		}
-		if(index == 30) {
-			led.set(0.69);
+		else if (!limitElevatorBottom.get()) {
+			led.set(-0.89); //Rainbow
+		}
+		
+		
+		//Heartbeat Leds in last 20 seconds
+		if(DriverStation.getInstance().getMatchTime() <= 20) {
+			led.set(-0.21);
+		}
+		
+		
+		//Reset Encoder
+		if (xbox.getRawButton(7)){ //Reset Encoder
+			leftEncoder.reset(); 
+			rightEncoder.reset();
+			elevatorEncoder.reset();
 		}
 		
 		
@@ -362,7 +392,8 @@ public class Robot extends VisualRobot {
 		SmartDashboard.putString("DB/String 3", "Right:" + Double.toString(rightEncoder.getDistance()));
 		SmartDashboard.putString("DB/String 4", "Elevator:" + Double.toString(elevatorEncoder.getRaw()));
 		SmartDashboard.putString("DB/String 5", "LimitElevatorTop:" + Boolean.toString(limitElevatorTop.get()));
-		SmartDashboard.putString("DB/String 6", "LimitElevatorBottom:" + Boolean.toString(!limitElevatorBottom.get()));
+		SmartDashboard.putString("DB/String 6", "LimitElevatorBot:" + Boolean.toString(!limitElevatorBottom.get()));
+		SmartDashboard.putString("DB/String 7", "cubeSensor:" + Boolean.toString(!cubeSensor.get()));
 	}
 }
 
