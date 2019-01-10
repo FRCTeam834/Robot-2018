@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -122,6 +123,8 @@ public class Robot extends VisualRobot {
 		elevatorEncoder.reset();
 		gyro.calibrate();
 		//Sensors Calibrated and Reset
+		
+		CameraServer.getInstance().startAutomaticCapture();
 	}
 	
 	
